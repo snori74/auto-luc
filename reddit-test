@@ -1,0 +1,42 @@
+import praw
+
+clientID = ?		# e.g. ??
+client_secret = ?	# e.g. 787987979797979897977797
+User_agent = ?		# e.g. android:com.example.myredditapp:v1.2.3 (by u/kemitche)
+
+#	 for ReadWrite access will also need reddit_user and Reddit_password!
+
+reddit = praw.Reddit(client_id='my client id',
+                     client_secret='my client secret',
+                     user_agent='my user agent',
+                     username='my username',
+                     password='my password')
+
+print(reddit.read_only)  # Output: False
+
+# assume you have a Reddit instance bound to variable `reddit`
+subreddit = reddit.subreddit('redditdev')
+
+print(subreddit.display_name)  # Output: redditdev
+print(subreddit.title)         # Output: reddit Development
+print(subreddit.description)   # Output: A subreddit
+
+# assume you have a Subreddit instance bound to variable `subreddit`
+# This example uses 'hot', but could also search based on: controversial,
+# gilded, new, rising - or top
+
+for submission in subreddit.hot(limit=10):
+    print(submission.title)  # Output: the submission's title
+    print(submission.score)  # Output: the submission's score
+    print(submission.id)     # Output: the submission's ID
+    print(submission.url)    # Output: the URL the submission points to
+ 
+# submitting a post...
+#
+# Docs:
+#        submit(title, selftext=None, url=None, flair_id=None, flair_text=None, 
+#               resubmit=True, send_replies=True, nsfw=False, spoiler=False, 
+#               collection_id=None)
+
+
+ 
