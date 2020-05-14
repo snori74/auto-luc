@@ -1,31 +1,34 @@
 import praw
-
-clientID = ?		# e.g. ??
-client_secret = ?	# e.g. 787987979797979897977797
-User_agent = ?		# e.g. android:com.example.myredditapp:v1.2.3 (by u/kemitche)
-
+from luc_settings import REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USER_AGENT
+from luc_settings import REDDIT_USERNAME, REDDIT_PASSWORD
 #	 for ReadWrite access will also need reddit_user and Reddit_password!
 
-reddit = praw.Reddit(client_id='my client id',
-                     client_secret='my client secret',
-                     user_agent='my user agent',
-                     username='my username',
-                     password='my password')
+reddit = praw.Reddit(client_id='REDDIT_CLIENT_ID',
+                     client_secret='REDDIT_CLIENT_SECRET',
+                     user_agent='REDDIT_USER_AGENT',
+                     username='REDDIT_USERNAME',
+                     password='REDDIT_PASSWORD')
 
-print(reddit.read_only)  # Output: False
+print("Is this reddit ReadOnly?:", reddit.read_only)  # Output: False
 
-# assume you have a Reddit instance bound to variable `reddit`
-subreddit = reddit.subreddit('redditdev')
+subreddit = reddit.subreddit('linuxupskillchallenge')
+print("Selected subreddit: r/", subreddit)
 
-print(subreddit.display_name)  # Output: redditdev
-print(subreddit.title)         # Output: reddit Development
-print(subreddit.description)   # Output: A subreddit
+# print("Checking my ID: ", reddit.user.me())
+
+print("display_name: ", subreddit.display_name)  
+print("title; ", subreddit.title)         
+# print("description: ", subreddit.description)  
 
 # assume you have a Subreddit instance bound to variable `subreddit`
 # This example uses 'hot', but could also search based on: controversial,
 # gilded, new, rising - or top
 
-for submission in subreddit.hot(limit=10):
+for submission in reddit.subreddit('test').hot(limit=25):
+    print(submission.title)
+
+for submission in subreddit.new(limit=10):
+    print("next sub...")
     print(submission.title)  # Output: the submission's title
     print(submission.score)  # Output: the submission's score
     print(submission.id)     # Output: the submission's ID

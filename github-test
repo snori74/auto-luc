@@ -4,13 +4,14 @@
 #
 
 from github import Github
+from luc_settings import GITHUB_ACCESS_TOKEN
 
 # 	using a personal access token
 #
-g = Github("abc336e4c19dfb1abc33")
+g = Github(GITHUB_ACCESS_TOKEN)
 
 #	grab the raw content of one file
 #
 repo = g.get_repo("snori74/linuxupskillchallenge")
-contents = repo.get_contents("1.md")
+contents = repo.get_contents("20.md")
 print(contents.decoded_content)
