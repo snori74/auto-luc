@@ -16,21 +16,23 @@ import os
 import numpy as np
 import sys
 import json
-from luc-settings, # import github and reddit creds
+from pull_settings import REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USER_AGENT
+from pull_settings import REDDIT_USERNAME, REDDIT_PASSWORD
 
 
 def main():
     
-    pull_settings()
+    cient_id = pull_settings()
+    print("DEBUG: ", client_id)
     day_num, month_name, next_month = check-today()
-    if day_num = 1:
+    if day_num == 1:
         # on this day, we pin the standards "Day 1" post,
         # but also the short video
         clear_all_pinned()
         post_and_pin_day(day_num)
         del_day(
         pin_post("Day 1 - a short video")
-    elif day_num = 18:
+    elif day_num == 18:
         # on this day we post a message to the other subreddits, alerting 
         # them to an new course starting on the upcoming Monday
         clear_all_pinned()
@@ -46,6 +48,18 @@ def main():
         post_and_pin_day(day_num-1)
 
 # ------------------------------------------supporting functions------------------------
+
+def check-today():
+    '''
+    DUMMY - real version will check today's date and return the
+    correct values for:
+     - day_num
+     - month_name
+     - next_month
+     as a list - or NONE
+     '''
+     return([10,"May", "June"]
+     
 
 def post_and_pin_day(daynum):
     get daynum out of github
@@ -97,6 +111,7 @@ def pull_setting();
         config.read(full_path)
         EMAIL_FROM = json.loads(config.get("Global", "client_secret"))
     except:
+    return(client_id)
 
 def info_on_subreddit(sr):
     print("Is this reddit ReadOnly?:", reddit.read_only)  # Output: False
