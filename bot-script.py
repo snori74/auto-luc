@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
+
 #   bot-script.py - Intended to be run every day, doing
 #                   posts to reddit from data kept in github
 #                   for the Linix Upskill Challenge.
@@ -18,19 +20,21 @@ import sys
 import json
 from pull_settings import REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USER_AGENT
 from pull_settings import REDDIT_USERNAME, REDDIT_PASSWORD
+from github import Github
+from luc_settings import GITHUB_ACCESS_TOKEN
 
 
 def main():
     
     cient_id = pull_settings()
     print("DEBUG: ", client_id)
-    day_num, month_name, next_month = check-today()
+    day_num, month_name, next_month = check_today()
     if day_num == 1:
         # on this day, we pin the standards "Day 1" post,
         # but also the short video
         clear_all_pinned()
         post_and_pin_day(day_num)
-        del_day(
+        del_day()
         pin_post("Day 1 - a short video")
     elif day_num == 18:
         # on this day we post a message to the other subreddits, alerting 
@@ -49,7 +53,7 @@ def main():
 
 # ------------------------------------------supporting functions------------------------
 
-def check-today():
+def check_today():
     '''
     DUMMY - real version will check today's date and return the
     correct values for:
@@ -58,12 +62,20 @@ def check-today():
      - next_month
      as a list - or NONE
      '''
-     return([10,"May", "June"]
+    return([10,"May", "June"])
      
 
 def post_and_pin_day(daynum):
-    get daynum out of github
+    #get daynum out of github
+    g = Github(GITHUB_ACCESS_TOKEN)
+    repo = g.get_repo("snori74/linuxupskillchallenge")
+    contents = repo.get_contents("12.md")
+    file_name = daynum, ".md"    # e.g "12.md"
+    print("Raw contents of ", file_name, ": ", contents.decoded_content)
+    print(contents.decoded_content)
+
     extract subject from body
+    print("Will post with Subcet of: ", subject)
     post to reddit
     make mod
     make favorite/pinned

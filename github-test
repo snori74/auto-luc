@@ -10,8 +10,24 @@ from luc_settings import GITHUB_ACCESS_TOKEN
 #
 g = Github(GITHUB_ACCESS_TOKEN)
 
-#	grab the raw content of one file
+# testing...
+#
+encoding = 'utf-8'
+test = b'helloi there '.decode(encoding)
+print("test: ", test)
+
+
+
+
+# #	grab the raw content of one file
 #
 repo = g.get_repo("snori74/linuxupskillchallenge")
-contents = repo.get_contents("20.md")
-print(contents.decoded_content)
+contents = repo.get_contents("12.md")
+raw = contents.decoded_content
+print(raw)
+lines = raw.decode('utf-8')
+# split_content = raw.split("\n")
+for line in lines:
+    print(line)
+
+
