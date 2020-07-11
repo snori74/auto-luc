@@ -10,7 +10,10 @@ Yes, but there are some surprising results ('corner cases') like, sometimes:
  - there is a whole week gap at the end of a course (e.g. June 2020)
 
 One approach to a bot was to run it each day - and check what day of what course we're on - and then act accordingly.
-Basically, on "Day x" retreive and post the "Day x" lesson - but also delete that for "Day x'-5. On Day 16, post a messag about next month course (and also to other subreddits), and on Day 1 clean out all the old lessons.  But, the big trick is to (from today's date) figure out if the course is running at all, and if so, which day we're on.
+Basically, on "Day x" retreive and post the "Day x" lesson - but also delete that for "Day x'-5. 
+On Day 16, post a message about next month course (and also to other subreddits), and on Day 1 clean out all the old 
+lessons.  But, the big trick is to (from today's date) figure out if the course is running at all, and if so, 
+which day we're on.
 
 So, the check_today() function is prtty important:
 
