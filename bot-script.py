@@ -26,8 +26,8 @@ from luc_settings import GITHUB_ACCESS_TOKEN
 
 def main():
     
-    cient_id = pull_settings()
-    print("DEBUG: ", client_id)
+    # cient_id = pull_settings()
+    print("DEBUG: Redddit Client ID", REDDIT_CLIENT_ID)
     day_num, month_name, next_month = check_today()
     if day_num == 1:
         # on this day, we pin the standards "Day 1" post,
@@ -74,23 +74,25 @@ def post_and_pin_day(daynum):
     print("Raw contents of ", file_name, ": ", contents.decoded_content)
     print(contents.decoded_content)
 
-    extract subject from body
+    # extract subject from body
     print("Will post with Subcet of: ", subject)
-    post to reddit
-    make mod
-    make favorite/pinned
-    make accepted
+    # post to reddit
+    # make mod
+    # make favorite/pinned
+    # make accepted
 
 def clear_all_pinned():
-    find list of asll pined
-    feach, unpin
+    # find list of asll pined
+    # feach, unpin
+    pass
 
 def post_to_linux():
-    get fro github 'post_for_lixux.txt'
-    extract subject?
-    post text as md to r/linux 
+    # get fro github 'post_for_lixux.txt'
+    # extract subject?
+    # post text as md to r/linux 
+    pass
 
-def pull_setting();
+def pull_settings():
     #    Pull settings, including 'secrets', from local dot file
     #
     config = configparser.ConfigParser()
@@ -123,7 +125,7 @@ def pull_setting();
         config.read(full_path)
         EMAIL_FROM = json.loads(config.get("Global", "client_secret"))
     except:
-    return(client_id)
+        return(client_id)
 
 def info_on_subreddit(sr):
     print("Is this reddit ReadOnly?:", reddit.read_only)  # Output: False

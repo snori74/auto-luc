@@ -24,10 +24,18 @@ print("test: ", test)
 repo = g.get_repo("snori74/linuxupskillchallenge")
 contents = repo.get_contents("12.md")
 raw = contents.decoded_content
-print(raw)
+print(type(raw), raw)
+raw_lines=raw.split(b'\n')
+print("First line is: ", raw_lines[0])
+prefix = "# "
+if raw_lines[0].startswith(bytes(prefix, 'utf-8')):
+        subject = raw_lines[0][len(prefix):]
+print("Post subject therefore will be: ", subject)
+
 lines = raw.decode('utf-8')
+print(type(lines))
 # split_content = raw.split("\n")
-for line in lines:
-    print(line)
+# for line in lines:
+#    print(line)
 
 

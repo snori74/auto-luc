@@ -11,7 +11,7 @@ from luc_settings import GITHUB_ACCESS_TOKEN
 g = Github(GITHUB_ACCESS_TOKEN)
 reddit = praw.Reddit('test')
 repo = g.get_repo("snori74/linuxupskillchallenge")
-subreddit = reddit.subreddit('linuxupskillchallange')
+subreddit = reddit.subreddit('linuxupskillchallenge')
 
 #------------------------------main----------------------------------------------------------------
 
@@ -28,6 +28,9 @@ def main():
       - Grab the appropriate text from GitHub
       - Process the first line to get 'title'
       - post and pin
+
+    On DAY 1 - "Delete old day of and day one. And 17-20. Post new ones, and sticky"
+
 """
 
     *
