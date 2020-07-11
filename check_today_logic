@@ -15,7 +15,7 @@ On Day 16, post a message about next month course (and also to other subreddits)
 lessons.  But, the big trick is to (from today's date) figure out if the course is running at all, and if so, 
 which day we're on.
 
-So, the check_today() function is prtty important:
+So, the check_today() function is pretty important:
 
 def check_today():
     '''
@@ -31,7 +31,7 @@ def check_today():
 As to what logic should go in there to *actully* make this work, for a long time, I've had a strange
 mental block against even thinking aabout it.
 
-However, recently waking up at 4am I came up with the following (in pseudocode):
+However, recently waking up at 4am I came up with the following:
 
     If we're on day 4 of the week (i.e. Thursday), save that value as "days_into_week" then find the 
     monday of that week (i.e. date - days_into_week). The month of that is "month_name" in all cases. 
