@@ -1,0 +1,51 @@
+ The course:
+
+    "runs from the first Monday of the month, for four weeks"
+
+Seems pretty simple huh?
+
+Yes, but there are some surprising results ('corner cases') like, sometimes:
+
+ - the last few days of the course for <MONTH>, end up being in <MONTH+1> (e.g April 2020)
+ - there is a whole week gap at the end of a course (e.g. June 2020)
+
+One approach to a bot was to run it each day - and check what day of what course we're on - and then act accordingly.
+Basically, on "Day x" retreive and post the "Day x" lesson - but also delete that for "Day x'-5. On Day 16, post a messag about next month course (and also to other subreddits), and on Day 1 clean out all the old lessons.  But, the big trick is to (from today's date) figure out if the course is running at all, and if so, which day we're on.
+
+So, the check_today() function is prtty important:
+
+def check_today():
+    '''
+    DUMMY - real version will check today's date and return the
+    correct values for:
+     - day_num
+     - month_name
+     - next_month
+     as a list - or NONE, to signal "not a course day"
+     '''
+    return([10,"May", "June"])
+
+As to what logic should go in there to *actully* make this work, for a long time, I've had a strange
+mental block against even thinking aabout it.
+
+However, recently waking up at 4am I came up with the following (in pseudocode):
+
+    If we're on day 4 of the week (i.e. Thursday), save that value as "days_into_week" then find the 
+    monday of that week (i.e. date - days_into_week). The month of that is "month_name" in all cases. 
+    Calculating "next_month" is of course trivial.
+
+    Now, from that Monday, step back 7 days each time, counting, until Month.(this_monday) <> month_name. 
+    Now (7 * weeks_back + days_into_week) gives us day_num
+
+I'm pretty sure that covers all cases, but 4am is 4am so there's probably a *much* simpler way of doing this.
+
+ - Steve  
+
+
+
+
+
+
+
+
+
