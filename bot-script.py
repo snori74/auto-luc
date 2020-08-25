@@ -18,9 +18,6 @@ import json
 import praw
 import datetime
 from github import Github
-from luc_settings import REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USER_AGENT
-from luc_settings import REDDIT_USERNAME, REDDIT_PASSWORD
-from luc_settings import GITHUB_ACCESS_TOKEN
 
 def main():
     
@@ -29,8 +26,8 @@ def main():
             "\n Usage: bot-script.py LIVE|TEST [<date>]"
             "\n "
             "\n e.g     bot-script LIVE             "  #   Production, today's date
-            "\n         bot-script TEST             "  #   Test, today's date - posts to r/linuxupskillBotTest
-            "\n         bot-script TEST 2020-11-01  "  #   Test of 1 Nov 2020 - posts to r/linuxupskillBotTest"
+            "\n         bot-script TEST             "  #   Test, today, to r/linuxupskillBotTest
+            "\n         bot-script TEST 2020-11-01  "  #   Test, 1Nov2020 to r/linuxupskillBotTest"
             "\n "
         )
     if sys.argv[1] == "LIVE":    
@@ -50,9 +47,16 @@ def main():
         else:
             today_date = datetime.date.today()
 
-    day_num, month_name, next_month = check_today(today_date)
+    #   Get credentials
+    REDDIT_CLIENT_ID = get_setting("REDDIT_CLIENT_ID")
+    REDDIT_CLIENT_SECRET = get_setting("REDDIT_CLIENT_SECRET")
+    REDDIT_USER_AGENT = get_setting("REDDIT_USER_AGENT")
+    REDDIT_USERNAME = get_setting("REDDIT_USERNAME")
+    REDDIT_PASSWORD = get_setting("REDDIT_PASSWORD")
+    GITHUB_ACCESS_TOKEN = get_setting("GITHUB_ACCESS_TOKEN")
     
-    #DEBUG!!
+    #   Which day of the course are we on?
+    day_num, month_name, next_month = check_today(today_date)
     print("We're on day: ", day_num, " of the course")
     
     if day_num == 1:
@@ -74,9 +78,7 @@ def main():
         post_and_pin_day(subreddit, title, body)
         del_day(day_num - 4)
  
-        #    now retrieve custom 'advert' message for other subreddits,
-        #    and post to those subreddits, alerting them to the new
-        #    course starting on first Monday of the coming month
+        #    and custom 'advert' message for other subreddits,
         advert_to_subreddit("linux")
         advert_to_subreddit("linux4noobs")
         advert_to_subreddit("linuxadmin")
@@ -127,6 +129,27 @@ def check_today(thisdate):
     #   ...but we only have 20 lessons...
     if day_num > 20: return(None, None, None)
     return([day_num,month_name, "June"])
+
+def get_setting(setting):
+    '''
+    Pull settings, including 'secrets', from local dot file
+    '''
+    config = configparser.ConfigParser()
+    config_dir = os.path.expanduser('~/.auto-luc/')
+    full_path = config_dir + 'config'
+    
+    try:
+        config.read(full_path)
+        setting_value = json.loads(config.get("Global", setting))
+        print(setting, "=", setting_value)
+        return setting_value
+    except:
+        sys.exit(
+            "\n[Error]: ", setting, " not found.\n"
+            "\n   The script expects settings to be stored"
+            "\n   in the file: ~/.auto-luc/config "
+            "\n"
+        )
 
 def get_lesson(daynum):
     #   get daynum out of github
