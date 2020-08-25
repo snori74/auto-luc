@@ -6,10 +6,10 @@
                    /r/linuxupskillchallenge - based on the text in 
                    github snori74/linuxupskillchallenge.
 
-Note, need to be very careful not to run the script twice in one day, currently
-it is not 'idempotent'
-'''
+    Note, you need to be very careful not to run the script twice in one day, 
+    as currently it's not 'idempotent'
 
+'''
 import configparser
 import os
 import numpy as np
@@ -76,8 +76,7 @@ def main():
         title, body = get_lesson(day_num)
         post_and_pin_day(subreddit, title, body)
         del_day(day_num - 4)
- 
-        #    and custom 'advert' message for other subreddits,
+        #    ...and custom 'advert' message for other subreddits
         advert_to_subreddit("linux")
         advert_to_subreddit("linux4noobs")
         advert_to_subreddit("linuxadmin")
@@ -107,23 +106,21 @@ def check_today(thisdate):
     
     print("We're on day #: ", days_into_week, " of the week, where 1=Monday", flush=True)
 
-    #   Weekend?, exit with all nulls
+    #   No lesson on the weekend
     if days_into_week == 6: return(None, None, None)
     if days_into_week == 7: return(None, None, None)
 
     #   Find the Monday of that week 
     thismonday = thisdate - (delta * (days_into_week-1))
-    #   The month of that is "month_num" in all cases. 
+    #   The month of that is "month_num" in all cases... 
     month_num = thismonday.month    #    January=1, December=12
     month_name = thismonday.strftime("%B")
-
     #   Now, from that Monday, step back 7 days each time, counting, 
     #   until Month.(this_monday) <> month_num. 
     weeks_back = 0
     while thismonday.month == month_num:
         thismonday = thismonday - (delta7)
         weeks_back = weeks_back + 1
-
     #   We've gone one week too far back, so...
     weeks_back = weeks_back -1
  
