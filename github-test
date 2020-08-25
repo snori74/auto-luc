@@ -8,8 +8,8 @@ from luc_settings import GITHUB_ACCESS_TOKEN
 
 # 	using a personal access token
 #
-g = Github(GITHUB_ACCESS_TOKEN)
-
+# g = Github(GITHUB_ACCESS_TOKEN)
+g = Github("8345555c4573f2d72739356fbc67bb6f852dce51")
 # testing...
 #
 encoding = 'utf-8'
@@ -22,7 +22,7 @@ print("test: ", test)
 # #	grab the raw content of one file
 #
 repo = g.get_repo("snori74/linuxupskillchallenge")
-contents = repo.get_contents("12.md")
+contents = repo.get_contents("01.md")
 raw = contents.decoded_content
 print(type(raw), raw)
 raw_lines=raw.split(b'\n')
