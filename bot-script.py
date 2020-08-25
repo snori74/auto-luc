@@ -57,12 +57,11 @@ def main():
     
     #   Which day of the course are we on?
     day_num, month_name, next_month = check_today(today_date)
-    print("We're on day: ", day_num, " of the course")
     
     if day_num == 1:
         #    On this day, we pin the standard "Day 1"
         #    post - and the short video
-        clear_all_pinned()
+        clear_all_pinned(subreddit)
         title, body = get_lesson(day_num)
         post_and_pin_day(subreddit, title, body)
         post_and_pin("Day 1 - a short video")
@@ -86,7 +85,7 @@ def main():
         advert_to_subreddit("sysadmin")
         
     else:
-        clear_all_pinned()
+        clear_all_pinned(subreddit)
         post_and_pin("HOW THIS WORKS")
         post_and_pin_day(day_num)
         del_day(day_num - 4)
@@ -94,7 +93,12 @@ def main():
 # ------------------------------------------supporting functions------------------------
 
 def check_today(thisdate):
-    
+    '''
+    Course runs from "the first Monday of the month, and lasts for four weeks"
+    Simple, but there are some surprising results ('corner cases') like, sometimes:
+     - the last few days of the course for <MONTH>, end up being in <MONTH+1> (e.g April 2020)
+     - there is a whole week gap at the end of a course (e.g. June 2020)
+    '''
     delta = datetime.timedelta(days=1)
     delta7 = datetime.timedelta(days=7)
     
@@ -126,8 +130,11 @@ def check_today(thisdate):
     #   Each week is five days of lessons - and then the few days of 
     #   the week we're in...
     day_num = ((weeks_back) * 5) + days_into_week
+
     #   ...but we only have 20 lessons...
     if day_num > 20: return(None, None, None)
+    
+    print("We're on day: ", day_num, " of the course")
     return([day_num,month_name, "June"])
 
 def get_setting(setting):
@@ -183,7 +190,6 @@ def post_to_linux():
     # post text as md to r/linux 
     pass
 
-
 def advert_to_subreddit(subreddit):
     '''
     Grab the matching advert text from Github, then
@@ -192,7 +198,6 @@ def advert_to_subreddit(subreddit):
     # get from Github
     # split to title and body
     # post to subreddit
-
 
 def info_on_subreddit(sr):
     print("Is this reddit ReadOnly?:", reddit.read_only)  # Output: False
@@ -225,7 +230,6 @@ def post_sticky(sr, title, body):
             print('Now done!')
         else:
             print('Still not showing as stickied')
-
 
 def delete_submission(sr, title):
     print('\nLooking for one to delete...: ')
