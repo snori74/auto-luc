@@ -31,10 +31,10 @@ def main():
             "\n "
         )
     if sys.argv[1] == "LIVE":    
-        today_date = datetime.date.today()
-        print("OK, so we're working with today's date: ", today_date)
         subreddit = "linuxupskillchallenge"
-        print("And posting to the LIVE r/upskillchallenge...")
+        print("Posting to the LIVE r/upskillchallenge...")
+        today_date = datetime.date.today()
+        print("And working with today's date: ", today_date)
     
     if sys.argv[1] == "TEST":
         subreddit = "linuxupskillBotTest"
@@ -46,6 +46,7 @@ def main():
         
         else:
             today_date = datetime.date.today()
+            print("And working with today's date: ", today_date)
 
     #   Get credentials
     REDDIT_CLIENT_ID = get_setting("REDDIT_CLIENT_ID")
@@ -59,44 +60,49 @@ def main():
     day_num, month_name, next_month = check_today(today_date)
     
     if day_num == 1:
-        #    On this day, we pin the standard "Day 1"
-        #    post - and the short video
-        clear_all_pinned(subreddit)
-        title, body = get_lesson(day_num)
-        post_and_pin_day(subreddit, title, body)
-        post_and_pin("Day 1 - a short video")
-        post("HOW THIS WORKS")  #   post, but don't pin (only two posts can be pinned) 
+        #    On this day, we post and pin the standard "Day 1"
+        #    lesson - and the "short video" - and also repost
+        #    the "HOW THIS WORKS" text - but don't pin this, 
+        #    because only two posts can be pinned at a time.
+        clear_all_pinned()
+        get_post_pin_day(day_num)
+        get_post_pin_title("Day 1 - a short video")
+        get_post_title("HOW THIS WORKS")    #   New post, but not pinned  
         #   clear last few of last month's lessons...
-        del_day(20); del_day(19); del_day(18); del_day(17)
-    
+        delete_day(20)
+        delete_day(19)
+        delete_day(18)
+        delete_day(17)
+        delete_day(16)
+   
     elif day_num == 18:
         #   retrive, post and pin today's lesson as normal
         clear_all_pinned()
-        post_and_pin("HOW THIS WORKS")
-        title, body = get_lesson(day_num)
-        post_and_pin_day(subreddit, title, body)
-        del_day(day_num - 4)
-        #    ...and custom 'advert' message for other subreddits
-        advert_to_subreddit("linux")
-        advert_to_subreddit("linux4noobs")
-        advert_to_subreddit("linuxadmin")
-        advert_to_subreddit("linuxmasterrace")
-        advert_to_subreddit("sysadmin")
+        get_post_pin_day(day_num)
+        delete_day(day_num - 4)
+        #   refresh the "How this Works" post
+        get_post_pin_title("HOW THIS WORKS")
+        #    ...and post custom 'advert' messages to subreddits
+        get_post_advert("linux")
+        get_post_advert("linux4noobs")
+        get_post_advert("linuxadmin")
+        get_post_advert("linuxmasterrace")
+        get_post_advert("sysadminiblogs")
         
     else:
         clear_all_pinned(subreddit)
-        post_and_pin("HOW THIS WORKS")
-        post_and_pin_day(day_num)
-        del_day(day_num - 4)
+        pin_title("HOW THIS WORKS")
+        get_post_pin_day(day_num)
+        delete_day(day_num - 4)
 
 # ------------------------------------------supporting functions------------------------
 
 def check_today(thisdate):
     '''
-    Course runs from "the first Monday of the month, and lasts for four weeks"
-    Simple, but there are some surprising results ('corner cases') like, sometimes:
-     - the last few days of the course for <MONTH>, end up being in <MONTH+1> (e.g April 2020)
-     - there is a whole week gap at the end of a course (e.g. June 2020)
+    Course "...runs from the first Monday of the month, and lasts for four weeks..."
+    Simple, but there are some surprising corner cases, e.g.:
+     - the last day or two of <MONTH>'s course end up being in <MONTH+1> (e.g April 2020)
+     - there's sometimes a whole week gap at the end of a course (e.g. June 2020)
     '''
     delta = datetime.timedelta(days=1)
     delta7 = datetime.timedelta(days=7)
@@ -110,9 +116,9 @@ def check_today(thisdate):
     if days_into_week == 6: return(None, None, None)
     if days_into_week == 7: return(None, None, None)
 
-    #   Find the Monday of that week 
+    #   Find the Monday of that week... 
     thismonday = thisdate - (delta * (days_into_week-1))
-    #   The month of that is "month_num" in all cases... 
+    #   ...the month of that is "month_num" in all cases. 
     month_num = thismonday.month    #    January=1, December=12
     month_name = thismonday.strftime("%B")
     #   Now, from that Monday, step back 7 days each time, counting, 
@@ -124,7 +130,7 @@ def check_today(thisdate):
     #   We've gone one week too far back, so...
     weeks_back = weeks_back -1
  
-    #   Each week is five days of lessons - and then the few days of 
+    #   Each week has five days of lessons - and then the few days of 
     #   the week we're in...
     day_num = ((weeks_back) * 5) + days_into_week
 
@@ -155,8 +161,21 @@ def get_setting(setting):
             "\n"
         )
 
-def get_lesson(daynum):
-    #   get daynum out of github
+
+'''
+    Renamed, re-org'd functions:
+        
+        get_post_pin_day(12)
+        get_post_pin_title("HOW THIS WORKS")
+        get_post_title("HOW THIS WORKS")
+        pin_title("HOW THIS WORKS")
+        get_post_advert("sysadmin")
+        clear_all_pinned()
+        delete_day(12)
+
+'''
+
+def get_day(daynum):
     g = Github(GITHUB_ACCESS_TOKEN)
     repo = g.get_repo("snori74/linuxupskillchallenge")
     contents = repo.get_contents("12.md")
@@ -167,19 +186,34 @@ def get_lesson(daynum):
     print("Will post with Subcet of: ", subject)
     return([title, body])
 
-def post_and_pin(subreddit, title, body):
-    post = subreddit.submit(title, selftext=body,
-    url=None, flair_id=None, flair_text=None,
-    resubmit=True, send_replies=True, nsfw=False, spoiler=False,
-    collection_id=None)
+def get_title(title):
+    g = Github(GITHUB_ACCESS_TOKEN)
+    repo = g.get_repo("snori74/linuxupskillchallenge")
+    contents = repo.get_contents("12.md")
+    file_name = daynum, ".md"    # e.g "12.md"
+    print("Raw contents of ", file_name, ": ", contents.decoded_content)
+    print(contents.decoded_content)
+    #   extract subject from body
+    print("Will post with Subcet of: ", subject)
+    return([title, body])
 
-    #   and "sticky" (pin) that post
+def get_post_pin_day(day_num):
+    title, body = get_day(day_num)
+    post = subreddit.submit(title, selftext=body,
+        url=None, flair_id=None, flair_text=None,
+        resubmit=True, send_replies=True, nsfw=False, spoiler=False,
+        collection_id=None)
+    #   and sticky/pin that post
     post.mod.sticky()
 
-def clear_all_pinned():
-    #   find list of all pinned
-    #   fetch, unpin
-    pass
+def get_post_pin_title(title):
+    title, body = get_title(title)
+    post = subreddit.submit(title, selftext=body,
+        url=None, flair_id=None, flair_text=None,
+        resubmit=True, send_replies=True, nsfw=False, spoiler=False,
+        collection_id=None)
+    #   and sticky/pin that post
+    post.mod.sticky()
 
 def post_to_linux():
     # get fro github 'post_for_lixux.txt'
@@ -205,9 +239,9 @@ def info_on_subreddit(sr):
     print("title; ", subreddit.title)
     print("description: ", subreddit.description)
 
-def clear_all_pinned(sr):
+def clear_all_pinned():
     print('\nPosts: ')
-    for post in sr.new(limit=25):
+    for post in subreddit.new(limit=25):
         print(post.title)
         if post.stickied:
             print('\tUnsticky-ing the one above')
