@@ -1,115 +1,19 @@
-#!/usr/bin/env python
-# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-'''
-   bot-script.py - Intended to be run every day. Posts the lessons
-                   for the Linux Upskill Challenge into the subreddit 
-                   /r/linuxupskillchallenge - based on the text in 
-                   github snori74/linuxupskillchallenge.
-
-    Note, you need to be very careful not to run the script twice in one day, 
-    as currently it's not 'idempotent'
+#   
+#   Supporting fuctions for bot-script.py
+#
 
 '''
-import configparser
-import os
-import numpy as np
-import sys
-import json
-import praw
-import datetime
-from github import Github
-from functions import (
-    check_today,
-    get_setting,
-    get_day,
-    get_title,
-    get_post_pin_day,
-    get_post_pin_title,
-    post_to_linux,
-    advert_to_subreddit,
-    info_on_subreddit,
-    clear_all_pinned,
-    post_sticky,
-    delete_submission
-)
-from settings import (
-    REDDIT_CLIENT_ID, 
-    REDDIT_CLIENT_SECRET,
-    REDDIT_USER_AGENT,
-    REDDIT_USERNAME,
-    REDDIT_PASSWORD,
-    GITHUB_ACCESS_TOKEN
-)
-def main():
-    
-    if len(sys.argv) < 2:
-        sys.exit(
-            "\n Usage: bot-script.py LIVE|TEST [<date>]"
-            "\n "
-            "\n e.g     bot-script LIVE             "  #   Production, today's date
-            "\n         bot-script TEST             "  #   Test, today, to r/linuxupskillBotTest
-            "\n         bot-script TEST 2020-11-01  "  #   Test, 1Nov2020 to r/linuxupskillBotTest"
-            "\n "
-        )
-    if sys.argv[1] == "LIVE":    
-        subreddit = "linuxupskillchallenge"
-        print("Posting to the LIVE r/upskillchallenge...")
-        today_date = datetime.date.today()
-        print("And working with today's date: ", today_date)
-    
-    if sys.argv[1] == "TEST":
-        subreddit = "linuxupskillBotTest"
-        print("Posting to the TEST subreddit:  r/upskillBotTest...")
+    Renamed, re-org'd functions:
         
-        if len(sys.argv) > 2:
-            today_date = datetime.datetime.strptime(sys.argv[2], '%Y-%m-%d')
-            print("And using date: ", today_date)
-        
-        else:
-            today_date = datetime.date.today()
-            print("And working with today's date: ", today_date)
-
-   
-    #   Which day of the course are we on?
-    day_num, month_name, next_month = check_today(today_date)
-    
-    if day_num == 1:
-        #    On this day, we post and pin the standard "Day 1"
-        #    lesson - and the "short video" - and also repost
-        #    the "HOW THIS WORKS" text - but don't pin this, 
-        #    because only two posts can be pinned at a time.
-        clear_all_pinned()
-        get_post_pin_day(day_num)
-        get_post_pin_title("Day 1 - a short video")
-        get_post_title("HOW THIS WORKS")    #   New post, but not pinned  
-        #   clear last few of last month's lessons...
-        delete_day(20)
-        delete_day(19)
-        delete_day(18)
-        delete_day(17)
-        delete_day(16)
-   
-    elif day_num == 18:
-        #   retrive, post and pin today's lesson as normal
-        clear_all_pinned()
-        get_post_pin_day(day_num)
-        delete_day(day_num - 4)
-        #   refresh the "How this Works" post
+        get_post_pin_day(12)
         get_post_pin_title("HOW THIS WORKS")
-        #    ...and post custom 'advert' messages to subreddits
-        get_post_advert("linux")
-        get_post_advert("linux4noobs")
-        get_post_advert("linuxadmin")
-        get_post_advert("linuxmasterrace")
-        get_post_advert("sysadminiblogs")
-        
-    else:
-        clear_all_pinned(subreddit)
+        get_post_title("HOW THIS WORKS")
         pin_title("HOW THIS WORKS")
-        get_post_pin_day(day_num)
-        delete_day(day_num - 4)
+        get_post_advert("sysadmin")
+        clear_all_pinned()
+        delete_day(12)
 
-# ------------------------------------------supporting functions------------------------
+'''
 
 def check_today(thisdate):
     '''
@@ -176,19 +80,6 @@ def get_setting(setting):
             "\n"
         )
 
-
-'''
-    Renamed, re-org'd functions:
-        
-        get_post_pin_day(12)
-        get_post_pin_title("HOW THIS WORKS")
-        get_post_title("HOW THIS WORKS")
-        pin_title("HOW THIS WORKS")
-        get_post_advert("sysadmin")
-        clear_all_pinned()
-        delete_day(12)
-
-'''
 
 def get_day(daynum):
     g = Github(GITHUB_ACCESS_TOKEN)
@@ -284,7 +175,4 @@ def delete_submission(sr, title):
         if post.title == title:
             print("Deleting: ", title)
             post.delete()
-
-if __name__ == "__main__":
-    main()
 
