@@ -2,18 +2,10 @@
 #   Supporting fuctions for bot-script.py
 #
 
-'''
-    Renamed, re-org'd functions:
-        
-        get_post_pin_day(12)
-        get_post_pin_title("HOW THIS WORKS")
-        get_post_title("HOW THIS WORKS")
-        pin_title("HOW THIS WORKS")
-        get_post_advert("sysadmin")
-        clear_all_pinned()
-        delete_day(12)
-
-'''
+import datetime
+import praw
+from github import Github
+from settings import *
 
 def check_today(thisdate):
     '''
@@ -82,29 +74,43 @@ def get_setting(setting):
 
 
 def get_day(daynum):
-    g = Github(GITHUB_ACCESS_TOKEN)
-    repo = g.get_repo("snori74/linuxupskillchallenge")
-    contents = repo.get_contents("12.md")
-    file_name = daynum, ".md"    # e.g "12.md"
-    print("Raw contents of ", file_name, ": ", contents.decoded_content)
-    print(contents.decoded_content)
-    #   extract subject from body
-    print("Will post with Subcet of: ", subject)
+    import requests
+    filename = str(daynum).zfill(2) + ".md" # zfill adds leading zeros where needed
+    print("Filename: ", filename)
+    title, body = get_file(filename)
+    print("Title6: ", title)
     return([title, body])
 
-def get_title(title):
-    g = Github(GITHUB_ACCESS_TOKEN)
-    repo = g.get_repo("snori74/linuxupskillchallenge")
-    contents = repo.get_contents("12.md")
-    file_name = daynum, ".md"    # e.g "12.md"
-    print("Raw contents of ", file_name, ": ", contents.decoded_content)
-    print(contents.decoded_content)
-    #   extract subject from body
-    print("Will post with Subcet of: ", subject)
+def get_file(filename):
+    import requests
+    starturl = "https://raw.githubusercontent.com/snori74/linuxupskillchallenge/master/"
+    url = starturl + filename
+    r = requests.get(url, allow_redirects=True)
+    #   comes back as type 'bytes'....
+    contents = (r.content)
+    #   ...so we convert to string
+    strcontent = contents.decode("utf-8")
+    #   title line off is everything before the newline...
+    title = (strcontent.partition('\n')[0])
+    #   ...and the body is everything after.
+    body = (strcontent.partition('\n')[2])
+    #   and then we trim the leading "# " off the title...
+    title = title.partition("# ")[2]
     return([title, body])
 
-def get_post_pin_day(day_num):
+def get_post_pin_day(sr, day_num):
     title, body = get_day(day_num)
+    print("Found: ", title)
+    post = sr.submit(title, selftext=body,
+        url=None, flair_id=None, flair_text=None,
+        resubmit=True, send_replies=True, nsfw=False, spoiler=False,
+        collection_id=None)
+    #   and sticky/pin that post
+    post.mod.sticky()
+
+def get_post_pin_file(subreddit, filename):
+    title, body = get_file(filename)
+    print("TITLE: ", title, "BODY: ", body)
     post = subreddit.submit(title, selftext=body,
         url=None, flair_id=None, flair_text=None,
         resubmit=True, send_replies=True, nsfw=False, spoiler=False,
@@ -112,17 +118,26 @@ def get_post_pin_day(day_num):
     #   and sticky/pin that post
     post.mod.sticky()
 
-def get_post_pin_title(title):
-    title, body = get_title(title)
+def get_post_day(sr, day_num):
+    title, body = get_day(day_num)
+    print("Found: ", title)
+    post = sr.submit(title, selftext=body,
+        url=None, flair_id=None, flair_text=None,
+        resubmit=True, send_replies=True, nsfw=False, spoiler=False,
+        collection_id=None)
+    #   but don't sticky/pin this post
+
+def get_post_file(subreddit, filename):
+    title, body = get_file(filename)
     post = subreddit.submit(title, selftext=body,
         url=None, flair_id=None, flair_text=None,
         resubmit=True, send_replies=True, nsfw=False, spoiler=False,
         collection_id=None)
-    #   and sticky/pin that post
-    post.mod.sticky()
+    #   but don't sticky/pin this post
+    
 
 def post_to_linux():
-    # get fro github 'post_for_lixux.txt'
+    # get for github 'post_for_lixux.txt'
     # extract subject?
     # post text as md to r/linux 
     pass
@@ -145,18 +160,17 @@ def info_on_subreddit(sr):
     print("title; ", subreddit.title)
     print("description: ", subreddit.description)
 
-def clear_all_pinned():
+def clear_all_pinned(subreddit):
     print('\nPosts: ')
+    print(subreddit)
     for post in subreddit.new(limit=25):
-        print(post.title)
         if post.stickied:
-            print('\tUnsticky-ing the one above')
+            print('\tUnsticky-ing: ', post.title)
             post.mod.sticky(state=False) # THIS works!
             post.mod.distinguish(how='no')
 
-def post_sticky(sr, title, body):
-
-    post = sr.submit(title, selftext=body)
+def post_sticky(subreddit, title, body):
+    post = subbreddit.submit(title, selftext=body)
     post.mod.distinguish(how='yes')
     post.mod.approve()
     post.mod.sticky(state=True)
@@ -168,11 +182,26 @@ def post_sticky(sr, title, body):
         else:
             print('Still not showing as stickied')
 
-def delete_submission(sr, title):
-    print('\nLooking for one to delete...: ')
-    for post in sr.new(limit=25):
+def delete_day(subreddit, day_num):
+    title = "Day " + str(day_num) + " - "
+    delete_title(subreddit, title)
+
+def delete_title(subreddit, title):
+    print('\nLooking to delete: ', title)
+    for post in subreddit.new(limit=25):
         print(post.title)
-        if post.title == title:
-            print("Deleting: ", title)
+        if post.title.startswith(title):
+            print("Deleting: ", post.title)
             post.delete()
+
+def pin_title(subreddit, title):
+    print('\nLooking to pin: ', title)
+    for post in subreddit.new(limit=25):
+        print(post.title)
+        if post.title.startswith(title):
+            print("Pinning: ", post.title)
+            post.mod.distinguish(how='yes')
+            post.mod.approve()
+            post.mod.sticky(state=True)
+            
 
