@@ -62,7 +62,7 @@ def get_setting(setting):
     try:
         config.read(full_path)
         setting_value = json.loads(config.get("Global", setting))
-        print(setting, "=", setting_value)
+        # print(setting, "=", setting_value)
         return setting_value
     except:
         sys.exit(
@@ -76,9 +76,7 @@ def get_setting(setting):
 def get_day(daynum):
     import requests
     filename = str(daynum).zfill(2) + ".md" # zfill adds leading zeros where needed
-    print("Filename: ", filename)
     title, body = get_file(filename)
-    print("Title6: ", title)
     return([title, body])
 
 def get_file(filename):
@@ -100,27 +98,27 @@ def get_file(filename):
 
 def get_post_pin_day(sr, day_num):
     title, body = get_day(day_num)
-    print("Found: ", title)
+    print("Posting: ", title)
     post = sr.submit(title, selftext=body,
         url=None, flair_id=None, flair_text=None,
         resubmit=True, send_replies=True, nsfw=False, spoiler=False,
         collection_id=None)
     #   and sticky/pin that post
-    post.mod.sticky()
+    post.mod.sticky(state=True)
 
 def get_post_pin_file(subreddit, filename):
     title, body = get_file(filename)
-    print("TITLE: ", title, "BODY: ", body)
+    print("Posting: ", title)
     post = subreddit.submit(title, selftext=body,
         url=None, flair_id=None, flair_text=None,
         resubmit=True, send_replies=True, nsfw=False, spoiler=False,
         collection_id=None)
     #   and sticky/pin that post
-    post.mod.sticky()
+    post.mod.sticky(state=True)
 
 def get_post_day(sr, day_num):
     title, body = get_day(day_num)
-    print("Found: ", title)
+    print("Posting: ", title)
     post = sr.submit(title, selftext=body,
         url=None, flair_id=None, flair_text=None,
         resubmit=True, send_replies=True, nsfw=False, spoiler=False,
@@ -142,14 +140,31 @@ def post_to_linux():
     # post text as md to r/linux 
     pass
 
-def advert_to_subreddit(subreddit):
+def get_post_advert(advert_subreddit, subreddit_name):
     '''
-    Grab the matching advert text from Github, then
-    post it to the subreddit
+    A bit messy, but essentially we retrive a file for each of the other 
+    subreddits that we want to advertise in, and post it there - unless 
+    we're in TEST mode, in which case we post the adverts in the same test 
+    subreddit that we use for our main posts.
+    
+    The 'advert' text files are named in a very specific way:
+    
+           txt-for-linux-subreddit.md
+           txt-for-sysadminblogs-reddit.md
     '''
-    # get from Github
-    # split to title and body
-    # post to subreddit
+    
+    if advert_subreddit = "linuxupskillBotTest":
+        sr = "linuxupskillBotTest"
+    else:
+        sr = subreddit 
+
+    advert_file = "txt-for-" + subreddit + "-subreddit.md"
+    title, body = get_file(advert_file)
+    print("Posting: ", title)
+    post = sr.submit(title, selftext=body,
+        url=None, flair_id=None, flair_text=None,
+        resubmit=True, send_replies=True, nsfw=False, spoiler=False,
+        collection_id=None)
 
 def info_on_subreddit(sr):
     print("Is this reddit ReadOnly?:", reddit.read_only)  # Output: False
@@ -161,11 +176,9 @@ def info_on_subreddit(sr):
     print("description: ", subreddit.description)
 
 def clear_all_pinned(subreddit):
-    print('\nPosts: ')
-    print(subreddit)
     for post in subreddit.new(limit=25):
         if post.stickied:
-            print('\tUnsticky-ing: ', post.title)
+            print('Unpinning: ', post.title)
             post.mod.sticky(state=False) # THIS works!
             post.mod.distinguish(how='no')
 
@@ -187,17 +200,13 @@ def delete_day(subreddit, day_num):
     delete_title(subreddit, title)
 
 def delete_title(subreddit, title):
-    print('\nLooking to delete: ', title)
     for post in subreddit.new(limit=25):
-        print(post.title)
         if post.title.startswith(title):
             print("Deleting: ", post.title)
             post.delete()
 
 def pin_title(subreddit, title):
-    print('\nLooking to pin: ', title)
     for post in subreddit.new(limit=25):
-        print(post.title)
         if post.title.startswith(title):
             print("Pinning: ", post.title)
             post.mod.distinguish(how='yes')

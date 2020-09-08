@@ -28,16 +28,6 @@ subreddit = None
     
 def main():
     
-    print("Creds we're using:", 
-        "\nREDDIT_CLIENT_ID: ", REDDIT_CLIENT_ID, 
-        "\nREDITTCLIENT_SECRET: ", REDDIT_CLIENT_SECRET,
-        "\nREDDIT_USER AGENT: ", REDDIT_USER_AGENT,
-        "\nREDDIT USERNAME: ", REDDIT_USERNAME,
-        "\nREDDIT PASSWORD: ", REDDIT_PASSWORD,
-        "\nGITHUB ACCESS TOKEN: ", GITHUB_ACCESS_TOKEN
-    )
-
-
     reddit = praw.Reddit(
             user_agent=REDDIT_USER_AGENT,
             client_id=REDDIT_CLIENT_ID, 
@@ -45,8 +35,6 @@ def main():
             username=REDDIT_USERNAME, 
             password=REDDIT_PASSWORD
             )
-    print("Reddit object setup: ", type(reddit), reddit)
-
 
     if len(sys.argv) < 2:
         sys.exit(
@@ -57,6 +45,7 @@ def main():
             "\n         bot-script TEST 2020-11-01  "  #   Test, 1Nov2020 to r/linuxupskillBotTest"
             "\n "
         )
+    
     if sys.argv[1] == "LIVE":    
         subreddit = reddit.subreddit("linuxupskillchallenge")
         print("Posting to the LIVE r/upskillchallenge...")
@@ -65,8 +54,9 @@ def main():
     
     if sys.argv[1] == "TEST":
         subreddit = reddit.subreddit("linuxupskillBotTest")
-        print("Posting to the TEST subreddit:  r/upskillBotTest...")
-        
+        advert_subreddit = reddit.subreddit("linuxupskillBotTest")
+        print("In TESTing mode...")
+
         if len(sys.argv) > 2:
             today_date = datetime.datetime.strptime(sys.argv[2], '%Y-%m-%d')
             print("And using date: ", today_date)
@@ -74,7 +64,6 @@ def main():
         else:
             today_date = datetime.date.today()
             print("And working with today's date: ", today_date)
-    print("Subreddit: ", subreddit, type(subreddit))
    
     #   Which day of the course are we on?
     day_num, month_name, next_month = check_today(today_date)
@@ -84,10 +73,12 @@ def main():
         #    lesson - and the "short video" - and also repost
         #    the "HOW THIS WORKS" text - but don't pin this, 
         #    because only two posts can be pinned at a time.
+        # 
         clear_all_pinned(subreddit)
         get_post_pin_day(subreddit, day_num)
         get_post_pin_file(subreddit, "day1-short-video.md")
         get_post_file(subreddit, "how-this-works.md")    #   New post, but not pinned  
+        #
         #   clear last few of last month's lessons...
         delete_day(subreddit, 20)
         delete_day(subreddit, 19)
@@ -96,20 +87,28 @@ def main():
         delete_day(subreddit, 16)
    
     elif day_num == 18:
+        #
         #   retrive, post and pin today's lesson as normal
         clear_all_pinned(subreddit)
         get_post_pin_day(subreddit, day_num)
         delete_day(subreddit, day_num - 4)
+        #
         #   refresh the "How this Works" post
-        get_post_pin_title(subreddit, "HOW THIS WORKS")
+        get_post_pin_file(subreddit, "how-this-works.md")
+        #
         #    ...and post custom 'advert' messages to subreddits
-        get_post_advert("linux")
-        get_post_advert("linux4noobs")
-        get_post_advert("linuxadmin")
-        get_post_advert("linuxmasterrace")
-        get_post_advert("sysadminiblogs")
+        get_post_advert(advert_subreddit, "linux")
+        get_post_advert(advert_subreddit, "linux4noobs")
+        get_post_advert(advert_subreddit, "linuxadmin")
+        get_post_advert(advert_subreddit, "linuxmasterrace")
+        get_post_advert(advert_subreddit, "sysadminiblogs")
         
+    elif day_num == None:
+        print("No lesson today...")
+        pass
+
     else:
+        #   a 'normal' weekday...
         clear_all_pinned(subreddit)
         pin_title(subreddit, "HOW THIS WORKS")
         get_post_pin_day(subreddit, day_num)
