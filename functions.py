@@ -145,8 +145,8 @@ def get_advert_file(filename):
     title = (strcontent.partition('\n')[0])
     #   ...and the body is everything after.
     body = (strcontent.partition('\n')[2])
-    #   and then we trim the leading "Title: " off the title...
-    title = title.partition("Title: ")[2]
+    #   and then we trim the leading "TITLE: " off the title...
+    title = title.partition("TITLE: ")[2]
     return([title, body])
 
 def insert_backlink(sr, body, day_num):

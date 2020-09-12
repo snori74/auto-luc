@@ -15,11 +15,9 @@ import datetime
 from functions import *
 from settings import *
 
-
 subreddit = None
     
 def main():
-    
     reddit = praw.Reddit(
             user_agent=REDDIT_USER_AGENT,
             client_id=REDDIT_CLIENT_ID, 
@@ -87,10 +85,10 @@ def main():
         get_post_pin_file(subreddit, "how-this-works.md")
         #
         #    ...and post custom 'advert' messages to subreddits
-        get_post_advert(subreddit, "linux")
         get_post_advert(subreddit, "linux4noobs")
         get_post_advert(subreddit, "linuxadmin")
         get_post_advert(subreddit, "linuxmasterrace")
+        get_post_advert(subreddit, "linux")
         get_post_advert(subreddit, "sysadminblogs")
         
     elif day_num == None:
