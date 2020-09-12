@@ -1,4 +1,4 @@
-#   
+   
 #   Supporting fuctions for bot-script.py
 #
 
@@ -9,17 +9,19 @@ from settings import *
 
 def check_today(thisdate):
     '''
-    Course "...runs from the first Monday of the month, and lasts for four weeks..."
+    The course is described as: 
     
-    Simple, but there are some surprising corner cases, e.g.:
-     - the last day or two of <MONTH>'s course end up being in <MONTH+1> (e.g April 2020)
+    "...runs from the first Monday of the month, and lasts for four weeks..."
+    
+    Simple? Yes, but there are some surprising corner cases, e.g.:
+     - sometimes the course doesn't start until the 7th of the month (e.g.September 2020)
+     - the last day or two of <MONTH>'s course end up being in <MONTH+1> (e.g September 2020)
      - there's sometimes a whole week gap at the end of a course (e.g. June 2020)
     
     '''
     delta = datetime.timedelta(days=1)
     delta7 = datetime.timedelta(days=7)
     
-    #   If we're on day 4 of the week (i.e. Thursday), save as "days_into_week"
     days_into_week = thisdate.isoweekday()    #    ISO weekday, 1=Monday
     
     print("We're on day #: ", days_into_week, " of the week, where 1=Monday", flush=True)
@@ -50,13 +52,30 @@ def check_today(thisdate):
     #   ...but we only have 20 lessons...
     if day_num > 20: return(None, None, None)
     
-    print("We're on day: ", day_num, " of the course")
     return([day_num,month_name, "June"])
 
 
 def get_setting(setting):
     '''
-    Pull settings, including 'secrets', from local dot file
+    Pull settings, 'secrets' and 'creds' from local dot file. 
+    This approach is much better and safer that hardcoding them 
+    in the code, or having them in 'gitignore'd files in the 
+    source tree, where they could accidentally be leaked.
+    
+    The file is essentially in ".ini" format (NB these creds are bogus): 
+        
+        [Global]
+
+        # Reddit
+        REDDIT_CLIENT_ID = "ABC998EDILHGA"
+        REDDIT_CLIENT_SECRET = "ZXCbhRmoLZo4xAIRD754aC3YaQ0" 
+        REDDIT_USER_AGENT = "thud"
+        REDDIT_USERNAME = "smellytoes"
+        REDDIT_PASSWORD = "tuulip99Wanderspring!"
+
+        # GitHub
+        GITHUB_ACCESS_TOKEN = "fbb9fe26660855920b5dfa098755391095e413d"
+    
     '''
     config = configparser.ConfigParser()
     config_dir = os.path.expanduser('~/.auto-luc/')
@@ -65,7 +84,6 @@ def get_setting(setting):
     try:
         config.read(full_path)
         setting_value = json.loads(config.get("Global", setting))
-        # print(setting, "=", setting_value)
         return setting_value
     except:
         sys.exit(
@@ -94,12 +112,12 @@ def get_file(filename):
     both it and the now-trimmed body as a list.
     '''
     import requests
+    
     starturl = "https://raw.githubusercontent.com/snori74/linuxupskillchallenge/master/"
     url = starturl + filename
     r = requests.get(url, allow_redirects=True)
-    #   comes back as type 'bytes'....
+    #   comes back as type 'bytes', which we convert to string
     contents = (r.content)
-    #   ...so we convert to string
     strcontent = contents.decode("utf-8")
     #   title line is everything before the newline...
     title = (strcontent.partition('\n')[0])
@@ -109,15 +127,77 @@ def get_file(filename):
     title = title.partition("# ")[2]
     return([title, body])
 
+def get_advert_file(filename):
+    '''
+    Given an advert filename, pulls text directly from Github (no API), in RAW 
+    format, then splits the title text off and tidies it - and returns 
+    both it and the now-trimmed body as a list.
+    '''
+    import requests
+    
+    starturl = "https://raw.githubusercontent.com/snori74/linuxupskillchallenge/master/"
+    url = starturl + filename
+    r = requests.get(url, allow_redirects=True)
+    #   comes back as type 'bytes', which we convert to string
+    contents = (r.content)
+    strcontent = contents.decode("utf-8")
+    #   title line is everything before the newline...
+    title = (strcontent.partition('\n')[0])
+    #   ...and the body is everything after.
+    body = (strcontent.partition('\n')[2])
+    #   and then we trim the leading "Title: " off the title...
+    title = title.partition("Title: ")[2]
+    return([title, body])
+
+def insert_backlink(sr, body, day_num):
+    #   go direct to the numbered lesson files
+    if day_num == 1:
+        print("No backlink in lesson 1")
+    else:
+        filename = str(day_num - 1 ).zfill(2) + ".md"    #   Padding '1' to '01'
+        title, body = get_file(filename)
+        url = "<missing>"
+        print("Previous post: ", title)
+        for post in sr.new(limit=25):
+            # print("Checking", post.title )
+            if post.title.startswith(title):
+                # print("Yup! foundit")
+                url = post.url
+
+        split_text = "Copyright 2012-2020 @snori74"
+        top_of_body= (body.partition(split_text)[0])
+        bottom_of_body= (body.partition(split_text)[2])
+        backlink_text = "\n\n## PREVIOUS DAY'S LESSON\n * [" + title+ "](" + url + ")\n\n"
+        body = top_of_body + backlink_text + split_text + bottom_of_body
+    
+    return body
+
+
 def get_post_pin_day(sr, day_num):
     title, body = get_day(day_num)
+    body = insert_backlink(sr, body, day_num)
     print("Posting: ", title)
     post = sr.submit(title, selftext=body,
         url=None, flair_id=None, flair_text=None,
         resubmit=True, send_replies=True, nsfw=False, spoiler=False,
         collection_id=None)
     #   and sticky/pin that post
-    post.mod.sticky(state=True)
+    print("Stickying...")
+    try:
+        post.mod.sticky(state=True)
+    except:
+         print("Hmm, can't sticky it for some reason...")
+
+    #
+    #    and pop in a matching "Thoughts and comments" post...
+    title, body = get_file("thoughts-and-comments.md")
+    #   replace X with the day number
+    title = title.partition("X")[0]+ str(day_num) + title.partition("X")[2]
+    post = sr.submit(title, selftext=body,
+        url=None, flair_id=None, flair_text=None,
+        resubmit=True, send_replies=True, nsfw=False, spoiler=False,
+        collection_id=None)
+
 
 def get_post_pin_file(subreddit, filename):
     title, body = get_file(filename)
@@ -129,6 +209,7 @@ def get_post_pin_file(subreddit, filename):
     #   and sticky/pin that post
     post.mod.sticky(state=True)
 
+
 def get_post_day(sr, day_num):
     title, body = get_day(day_num)
     print("Posting: ", title)
@@ -137,6 +218,7 @@ def get_post_day(sr, day_num):
         resubmit=True, send_replies=True, nsfw=False, spoiler=False,
         collection_id=None)
     #   but don't sticky/pin this post
+
 
 def get_post_file(subreddit, filename):
     title, body = get_file(filename)
@@ -147,34 +229,14 @@ def get_post_file(subreddit, filename):
     #   but don't sticky/pin this post
     
 
-def post_to_linux():
-    # get for github 'post_for_lixux.txt'
-    # extract subject?
-    # post text as md to r/linux 
-    pass
-
-
 def get_post_advert(subreddit, subreddit_name):
     '''
+    We retrive a file for each of the subreddits that we want to 
+    advertise in, and post into each of those subreddits - unless 
+    we're in TEST mode (i.e. if our "subreddit" is set to the test
+    location "LinuxUpSkillBotTest") - in which case we post the adverts
+    there too.
    
-    We retrive a file for each of the other subreddits that we want to 
-    advertise in, and post into each of those subreddits - unless our "subreddit" 
-    is set to the test location "LinuxUpSkillBotTest" - in which case we also post
-    these adverts there too.
-    
-    Logic:
-   
-    get the file from Github, based on subreddit_name
-
-    if subreddit == "LinuxUpSkillBotTest":
-        post to subreddit 
-    else:
-        if subreddit == "LinuxUpSkillChallenge":
-        subreddit = reddit.subreddit(subreddit_name)
-        post to subreddit
-   
-    Note:
-    
     The 'advert' text files are named in a very specific way:
     
            txt-for-linux-subreddit.md
@@ -182,30 +244,29 @@ def get_post_advert(subreddit, subreddit_name):
     
     '''
     advert_file = "txt-for-" + subreddit_name + "-subreddit.md"
-    title, body = get_file(advert_file)
+    print("Advert: ", advert_file)
+    title, body = get_advert_file(advert_file)
+    if title == "":
+        print("Bugger! for some reason no 'title'")
+        return
+
+    print("Title and body: ", title, body)
     
     if subreddit == "linuxupskillBotTest":
-        print("Posting: ", title)
-        post = sr.submit(title, selftext=body,
+        print("Posting advert to TEST subreddit")
+        post = subreddit.submit(title, selftext=body,
             url=None, flair_id=None, flair_text=None,
             resubmit=True, send_replies=True, nsfw=False, spoiler=False,
             collection_id=None)
 
     else:
         if subreddit == "linuxupskillChallenge":
-            subreddit = reddit.subreddit(subreddit_name)
-            print("Posting: ", title)
+            sr = reddit.subreddit(subreddit_name)
+            print("Posting advert to ", sr, "LIVE subreddit")
             post = sr.submit(title, selftext=body,
                 url=None, flair_id=None, flair_text=None,
                 resubmit=True, send_replies=True, nsfw=False, spoiler=False,
                 collection_id=None)
-
-
-    print("Posting: ", title)
-    post = sr.submit(title, selftext=body,
-        url=None, flair_id=None, flair_text=None,
-        resubmit=True, send_replies=True, nsfw=False, spoiler=False,
-        collection_id=None)
 
  
 def info_on_subreddit(sr):
@@ -219,10 +280,9 @@ def info_on_subreddit(sr):
 
 
 def clear_all_pinned(subreddit):
-    print(type(subreddit), subreddit)
     for post in subreddit.new(limit=25):
         if post.stickied:
-            print('Unpinning: ', post.title)
+            # print('Unpinning: ', post.title)
             post.mod.sticky(state=False) # THIS works!
             post.mod.distinguish(how='no')
 
@@ -256,7 +316,7 @@ def delete_title(subreddit, title):
 def pin_title(subreddit, title):
     for post in subreddit.new(limit=25):
         if post.title.startswith(title):
-            print("Pinning: ", post.title)
+            # print("Pinning: ", post.title)
             post.mod.distinguish(how='yes')
             post.mod.approve()
             post.mod.sticky(state=True)

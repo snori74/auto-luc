@@ -7,15 +7,6 @@
                     Challenge from Github into the subreddit 
 
     Note 1: Don't run more that once a day - you'll risk multiple posting 
-    Note 1a: Looks like we now have to generate a "Thoughts and comments 0 Day x" post too!
-    Note 2: Now with the added trick, (thanks u/Danny007dan), of inserting 
-    a "backlink" to the previous lesson just above the copyright notice,
-    like this:
-
-    ## PREVIOUS DAY'S LESSON
-    * [Day 3 - Power trip!](https://www.reddit.com/r/linuxupskillchallenge/comments/ip257g/day_3_power_trip/)
-    
-    Which is cool, but how to we programattically get that link? Huh? Danny?
     
     '''
 
@@ -46,7 +37,7 @@ def main():
             "\n         bot-script TEST 2020-11-01  "  #   Test, 1Nov2020 to r/linuxupskillBotTest"
             "\n "
         )
-    
+
     if sys.argv[1] == "LIVE":    
         today_date = datetime.date.today()
         subreddit = reddit.subreddit("linuxupskillchallenge")
@@ -66,6 +57,7 @@ def main():
             print("And working with today's date: ", today_date)
    
     #   Which day of the course are we on?
+    print("Double check: ", today_date)
     day_num, month_name, next_month = check_today(today_date)
     
     if day_num == 1:
@@ -99,7 +91,7 @@ def main():
         get_post_advert(subreddit, "linux4noobs")
         get_post_advert(subreddit, "linuxadmin")
         get_post_advert(subreddit, "linuxmasterrace")
-        get_post_advert(subreddit, "sysadminiblogs")
+        get_post_advert(subreddit, "sysadminblogs")
         
     elif day_num == None:
         print("No lesson today...")
