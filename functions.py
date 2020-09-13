@@ -246,24 +246,6 @@ def get_post_pin_file(subreddit, filename):
     post.mod.sticky(state=True)
 
 
-def get_post_day(sr, day_num):
-    title, body = get_day(day_num)
-    print("Posting: ", title)
-    post = sr.submit(
-        title,
-        selftext=body,
-        url=None,
-        flair_id=None,
-        flair_text=None,
-        resubmit=True,
-        send_replies=True,
-        nsfw=False,
-        spoiler=False,
-        collection_id=None,
-    )
-    #   but don't sticky/pin this post
-
-
 def get_post_file(subreddit, filename):
     title, body = get_file(filename)
     post = subreddit.submit(
@@ -337,36 +319,12 @@ def get_post_advert(subreddit, subreddit_name):
             )
 
 
-def info_on_subreddit(sr):
-    print("Is this reddit ReadOnly?:", reddit.read_only)  # Output: False
-    subreddit = sr
-    print("Selected subreddit: r/", subreddit)
-    print("Checking my ID: ", reddit.user.me())
-    print("display_name: ", subreddit.display_name)
-    print("title; ", subreddit.title)
-    print("description: ", subreddit.description)
-
-
 def clear_all_pinned(subreddit):
     for post in subreddit.new(limit=25):
         if post.stickied:
             # print('Unpinning: ', post.title)
             post.mod.sticky(state=False)  # THIS works!
             post.mod.distinguish(how="no")
-
-
-def post_sticky(subreddit, title, body):
-    post = subbreddit.submit(title, selftext=body)
-    post.mod.distinguish(how="yes")
-    post.mod.approve()
-    post.mod.sticky(state=True)
-    if not post.stickied:
-        print("Hmmm, seems we haven't sticky'd: ", title)
-        print("Pausing....")
-        if post.stickied:
-            print("Now done!")
-        else:
-            print("Still not showing as stickied")
 
 
 def delete_day(subreddit, day_num):
