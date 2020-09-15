@@ -186,8 +186,30 @@ def insert_backlink(sr, body, day_num):
 
 
 def get_post_pin_day(sr, day_num):
-   
-    #    Create a  "Thoughts and comments" post for this day...
+    title, body = get_day(day_num)
+    body = insert_backlink(sr, body, day_num)
+    print("Posting: ", title)
+    post = sr.submit(
+        title,
+        selftext=body,
+        url=None,
+        flair_id=None,
+        flair_text=None,
+        resubmit=True,
+        send_replies=True,
+        nsfw=False,
+        spoiler=False,
+        collection_id=None,
+    )
+    #   and sticky/pin that post
+    print("Stickying...")
+    try:
+        post.mod.sticky(state=True)
+    except:
+        print("Hmm, can't sticky it for some reason...")
+
+    #
+    #    and pop in a matching "Thoughts and comments" post...
     title, body = get_file("thoughts-and-comments.md")
     #   replace X with the day number
     title = title.partition("X")[0] + str(day_num) + title.partition("X")[2]
@@ -203,32 +225,8 @@ def get_post_pin_day(sr, day_num):
         spoiler=False,
         collection_id=None,
     )
-    #   Now get lesson...
-    title, body = get_day(day_num)
-    #   Insert backlink to the previos day
-    body = insert_backlink(sr, body, day_num)
-    #   ....and post
-    print("Posting: ", title)
-    post = sr.submit(
-        title,
-        selftext=body,
-        url=None,
-        flair_id=None,
-        flair_text=None,
-        resubmit=True,
-        send_replies=True,
-        nsfw=False,
-        spoiler=False,
-        collection_id=None,
-    )
-    #   and sticky/pin
-    print("Stickying...")
-    try:
-        post.mod.sticky(state=True)
-    except:
-        print("Hmm, can't sticky it for some reason...")
 
-    
+
 def get_post_pin_file(subreddit, filename):
     title, body = get_file(filename)
     print("Posting: ", title)
@@ -244,12 +242,8 @@ def get_post_pin_file(subreddit, filename):
         spoiler=False,
         collection_id=None,
     )
-    #   and sticky/pin
-    print("Stickying...")
-    try:
-        post.mod.sticky(state=True)
-    except:
-        print("Hmm, can't sticky it for some reason...")
+    #   and sticky/pin that post
+    post.mod.sticky(state=True)
 
 
 def get_post_file(subreddit, filename):
@@ -290,6 +284,8 @@ def get_post_advert(subreddit, subreddit_name):
         print("Bugger! for some reason no 'title'")
         return
 
+    print("Title and body: ", title, body)
+
     if subreddit == "linuxupskillBotTest":
         print("Posting advert to TEST subreddit")
         post = subreddit.submit(
@@ -326,11 +322,9 @@ def get_post_advert(subreddit, subreddit_name):
 def clear_all_pinned(subreddit):
     for post in subreddit.new(limit=25):
         if post.stickied:
-            print("Un-stickying...")
-            try:
-                post.mod.sticky(state=False)
-            except:
-                print("Hmm, can't un-sticky it for some reason...")
+            # print('Unpinning: ', post.title)
+            post.mod.sticky(state=False)  # THIS works!
+            post.mod.distinguish(how="no")
 
 
 def delete_day(subreddit, day_num):
@@ -348,8 +342,8 @@ def delete_title(subreddit, title):
 def pin_title(subreddit, title):
     for post in subreddit.new(limit=25):
         if post.title.startswith(title):
-            print("Stickying...")
-            try:
-                post.mod.sticky(state=True)
-            except:
-                print("Hmm, can't sticky it for some reason...")
+            # print("Pinning: ", post.title)
+            post.mod.distinguish(how="yes")
+            post.mod.approve()
+            post.mod.sticky(state=True)
+
