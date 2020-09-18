@@ -133,6 +133,7 @@ def get_file(filename):
     body = strcontent.partition("\n")[2]
     #   and then we trim the leading "# " off the title...
     title = title.partition("# ")[2]
+    # print("Title:\n", title, "\nBody: \n", body)    #   DEBUGGER
     return [title, body]
 
 
@@ -165,20 +166,20 @@ def insert_backlink(sr, body, day_num):
         print("No backlink in lesson 1")
     else:
         filename = str(day_num - 1).zfill(2) + ".md"  #   Padding '1' to '01'
-        title, body = get_file(filename)
-        url = "<missing>"
-        print("Previous post: ", title)
+        bl_title, bl_body = get_file(filename)
+        bl_url = "<missing>"
+        print("Previous post: ", bl_title)
         for post in sr.new(limit=25):
             # print("Checking", post.title )
-            if post.title.startswith(title):
+            if post.title.startswith(bl_title):
                 # print("Yup! foundit")
-                url = post.url
+                bl_url = post.url
 
         split_text = "Copyright 2012-2020 @snori74"
         top_of_body = body.partition(split_text)[0]
         bottom_of_body = body.partition(split_text)[2]
         backlink_text = (
-            "\n\n## PREVIOUS DAY'S LESSON\n * [" + title + "](" + url + ")\n\n"
+            "\n\n## PREVIOUS DAY'S LESSON\n * [" + bl_title + "](" + bl_url + ")\n\n"
         )
         body = top_of_body + backlink_text + split_text + bottom_of_body
 
@@ -187,6 +188,7 @@ def insert_backlink(sr, body, day_num):
 
 def get_post_pin_day(sr, day_num):
     title, body = get_day(day_num)
+    # print("In get_post_pin_day\nTitle:\n", title, "\nBody:\n", body)    #   DEBUGGER
     body = insert_backlink(sr, body, day_num)
     print("Posting: ", title)
     post = sr.submit(
@@ -201,6 +203,7 @@ def get_post_pin_day(sr, day_num):
         spoiler=False,
         collection_id=None,
     )
+
     #   and sticky/pin that post
     print("Stickying...")
     try:
@@ -242,9 +245,22 @@ def get_post_pin_file(subreddit, filename):
         spoiler=False,
         collection_id=None,
     )
-    #   and sticky/pin that post
-    post.mod.sticky(state=True)
 
+    #   and approve that post
+    print("Approving...")
+    try:
+        post.mod.approve()
+    except:
+        print("Hmm, can't approve it for some reason...")
+
+    #   and sticky that it
+    print("Stickying...")
+    try:
+        post.mod.sticky(state=True)
+    except:
+        print("Hmm, can't sticky it for some reason...")
+
+ 
 
 def get_post_file(subreddit, filename):
     title, body = get_file(filename)
@@ -322,9 +338,12 @@ def get_post_advert(subreddit, subreddit_name):
 def clear_all_pinned(subreddit):
     for post in subreddit.new(limit=25):
         if post.stickied:
-            # print('Unpinning: ', post.title)
-            post.mod.sticky(state=False)  # THIS works!
-            post.mod.distinguish(how="no")
+            print("Unsticking...")
+            try:
+                post.mod.sticky(state=False)
+                post.mod.distinguish(how="no")
+            except:
+                print("Hmm, can't sticky it for some reason...")
 
 
 def delete_day(subreddit, day_num):
@@ -342,8 +361,19 @@ def delete_title(subreddit, title):
 def pin_title(subreddit, title):
     for post in subreddit.new(limit=25):
         if post.title.startswith(title):
-            # print("Pinning: ", post.title)
-            post.mod.distinguish(how="yes")
-            post.mod.approve()
-            post.mod.sticky(state=True)
-
+            try:
+                print("Distinguishing...")
+                post.mod.distinguish(how="yes")
+            except:
+                print("Can't distiguish for some reason...")
+            try:
+                print("Approvng...")
+                post.mod.approve()
+            except:
+                print("Can't approve for some reason...")
+            try:
+                print("Stickying...")
+                post.mod.sticky(state=True)
+            except:
+                print("Not able to sticky for some reason")
+                

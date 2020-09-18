@@ -8,7 +8,23 @@
 
     Note 1: Don't run more that once a day - you'll risk multiple posting 
     
-    """
+    Note 2: This is basically a "Steve simulator":
+         - Steve, in NZ, gets out of bed on a Monday morning
+         - Feeds the cats, and makes himself a miso soup
+         - Then posts Monday's lesson - (it's about 8 or 9am by this time)
+         
+         - However, because this script runs "in the cloud", the server will be 
+           running (almost always) on UTC - so the task must be scheduled for
+           8pm, but on Monday morning Steve's time, it'll be 8pm in Greenwich
+           amnd it will be SUNDAY
+         - So, the script will run and say "No lesson on a weekend" - not good
+         - The "time_bump" variable is used to resolve this
+
+    Note 3: This also means that the 'cron' or similar used to run the script
+            can't be run just Monday-Friday (which might seem sensible), but 
+            instead should be scheduled EVERY day
+            
+         """
 
 import praw
 import datetime
@@ -55,6 +71,13 @@ def main():
             today_date = datetime.date.today()
             print("And working with today's date: ", today_date)
 
+#   Adjust the time with 'time_bump' 
+
+    time_bump = 0   #   If local timezone is NZ
+    time_bump = +12 #   If local timezone is UTC (i.e. a cloud server)
+
+
+
     #   Which day of the course are we on?
     day_num, month_name, next_month = check_today(today_date)
 
@@ -65,8 +88,11 @@ def main():
         clear_all_pinned(subreddit)
         get_post_pin_day(subreddit, day_num)
         get_post_pin_file(subreddit, "day1-short-video.md")
-        get_post_file(subreddit, "how-this-works.md")
-        #
+        #   delete the old "HOW..."
+        delete_title(subreddit, "HOW THIS WORKS")
+        #   then pull in the current one and pin...
+        get_post_pin_file(subreddit, "how-this-works.md")
+ #
         #   clear last few of last month's lessons...
         delete_day(subreddit, 20)
         delete_day(subreddit, 19)
@@ -82,7 +108,7 @@ def main():
         delete_day(subreddit, day_num - 4)
         
         #   delete the old "HOW..."
-        delete_title("HOW THIS WORKS")
+        delete_title(subreddit, "HOW THIS WORKS")
         #   then pull in the current one and pin...
         get_post_pin_file(subreddit, "how-this-works.md")
         
