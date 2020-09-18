@@ -71,12 +71,14 @@ def main():
             today_date = datetime.date.today()
             print("And working with today's date: ", today_date)
 
-#   Adjust the time with 'time_bump' 
-
+    #   Choose the correct 'time_bump' 
     time_bump = 0   #   If local timezone is NZ
-    time_bump = +12 #   If local timezone is UTC (i.e. a cloud server)
+    # time_bump = +12 #   If local timezone is UTC (i.e. a cloud server)
 
-
+    #   ...and apply it
+    # print("Before bump: ", today_date)
+    today_date = today_date + datetime.timedelta(hours=time_bump)
+    # print("After bump:  ", today_date)
 
     #   Which day of the course are we on?
     day_num, month_name, next_month = check_today(today_date)

@@ -1,0 +1,26 @@
+
+TO INSTALL TO UBUNTU
+
+Cn be installed to a numbr of places, but lets assume that you
+want to install to your own home directory. 
+
+Here's how to setup the directory for the bot:
+cd 
+sudo apt install virtualenv
+virtualenv -p python3 bot
+cd bot 
+source bin/activate
+pip install praw 
+
+Here's how to setup the config file:
+
+mkdir ~./auto-luc
+vim .auto-luc/config
+
+Note - you will need to edit the value of time_bump in 
+bot_script.py based on your timezome
+
+To run the bot:
+cd ~/bot 
+source bin/activate
+python3 bot_script
