@@ -15,10 +15,10 @@
          
          - However, because this script runs "in the cloud", the server will be 
            running (almost always) on UTC - so the task must be scheduled for
-           8pm, but on Monday morning Steve's time, it'll be 8pm in Greenwich
-           amnd it will be SUNDAY
+           8PM. But, on Monday morning Steve's time, it'll be 8pm in Greenwich
+           and it will be SUNDAY
          - So, the script will run and say "No lesson on a weekend" - not good
-         - The "time_bump" variable is used to resolve this
+         - This is why the "time_bump" variable exists
 
     Note 3: This also means that the 'cron' or similar used to run the script
             can't be run just Monday-Friday (which might seem sensible), but 
