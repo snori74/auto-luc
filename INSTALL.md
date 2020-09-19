@@ -8,9 +8,9 @@ want to install to directory 'bot' in your own home directory.
 First, you need to install the ability to create Python 'virtual environments'
 like this:
 
-sudo apt install virtualenv
+    sudo apt install virtualenv
 
-    From now on, everything is done by you, with no need for 'sudo'.
+_From now on, everything is done by you, with no need for 'sudo'_.
 
 Here's how to setup the directory for the bot:
 
