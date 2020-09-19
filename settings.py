@@ -20,6 +20,25 @@ settings = [
     "GITHUB_ACCESS_TOKEN",
 ]
 
+"""
+The ~/.auto-luc/config file is essentially in ".ini" format, like this: 
+        [Global]
+
+        # Reddit
+        REDDIT_CLIENT_ID = "ABC998EDILHGA"
+        REDDIT_CLIENT_SECRET = "ZXCbhRmoLZo4xAIRD754aC3YaQ0"
+        REDDIT_USER_AGENT = "thud"
+        REDDIT_USERNAME = "smellytoes"
+        REDDIT_PASSWORD = "tuulip99Wanderspring!"
+
+        # GitHub
+        GITHUB_ACCESS_TOKEN = "fbb9fe26660855920b5dfa098755391095e413d"
+
+(NB these creds are bogus)
+"""
+
+
+
 try:
     config.read(full_path)
     REDDIT_CLIENT_SECRET = json.loads(config.get("Global", "REDDIT_CLIENT_SECRET"))

@@ -27,7 +27,8 @@ Here's how to setup the config file:
 
 Note 1: You will need to edit the value of time_bump in 
 bot_script.py based on your timezone
-Note 2: The format for _.auto-luc/config_ is given in the function *get_sttings* in _functions.py_.
+
+Note 2: The format for _.auto-luc/config_ is given in _settings.py_.
 
 To run the bot:
 

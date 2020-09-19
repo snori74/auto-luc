@@ -60,47 +60,6 @@ def check_today(thisdate):
     return [day_num, month_name, "June"]
 
 
-def get_setting(setting):
-    """
-    Pull settings, 'secrets' and 'creds' from local dot file.
-    This approach is much better and safer that hardcoding them
-    in the code, or having them in 'gitignore'd files in the
-    source tree, where they could accidentally be leaked.
-
-    The file is essentially in ".ini" format (NB these creds are bogus):
-
-        [Global]
-
-        # Reddit
-        REDDIT_CLIENT_ID = "ABC998EDILHGA"
-        REDDIT_CLIENT_SECRET = "ZXCbhRmoLZo4xAIRD754aC3YaQ0"
-        REDDIT_USER_AGENT = "thud"
-        REDDIT_USERNAME = "smellytoes"
-        REDDIT_PASSWORD = "tuulip99Wanderspring!"
-
-        # GitHub
-        GITHUB_ACCESS_TOKEN = "fbb9fe26660855920b5dfa098755391095e413d"
-
-    """
-    config = configparser.ConfigParser()
-    config_dir = os.path.expanduser("~/.auto-luc/")
-    full_path = config_dir + "config"
-
-    try:
-        config.read(full_path)
-        setting_value = json.loads(config.get("Global", setting))
-        return setting_value
-    except:
-        sys.exit(
-            "\n[Error]: ",
-            setting,
-            " not found.\n"
-            "\n   The script expects settings to be stored"
-            "\n   in the file: ~/.auto-luc/config "
-            "\n",
-        )
-
-
 def get_day(daynum):
     """
     Works out the filename for the day's lesson, then
