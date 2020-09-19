@@ -25,8 +25,9 @@ Here's how to setup the config file:
     mkdir ~./auto-luc
     vim .auto-luc/config
 
-Note - you will need to edit the value of time_bump in 
-bot_script.py based on your timezome
+Note 1: You will need to edit the value of time_bump in 
+bot_script.py based on your timezone
+Note 2: The format for _.auto-luc/config_ is given in the function *get_sttings* in _functions.py_.
 
 To run the bot:
 
