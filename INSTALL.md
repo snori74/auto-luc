@@ -30,10 +30,26 @@ bot_script.py based on your timezone
 
 Note 2: The format for _.auto-luc/config_ is given in _settings.py_.
 
-To run the bot:
+To run the bot "manually", simply:
 
     cd ~/bot 
     source bin/activate
     python3 bot_script <params>
 
+To automate, first create a shell script like this 'run-bot':
+
+    #!/bin/bash
+    cd ~/bot 
+    source bin/activate
+    python3 bot_script.py 
+    
+Then create a cron entry (as an ordinary user, or as root) by _crontab -e_ with and entry like this:
+
+    SHELL=/bin/sh
+    PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+    # m h dom mon dow 	command
+    1 20	* * *	 /root/run-bot
+
+...which will run the script each day at 20:01 (8:01pm) - which is appropraite for a server running on UTC.
 
