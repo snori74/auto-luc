@@ -54,7 +54,7 @@ def main():
         )
 
     if sys.argv[1] == "LIVE":
-        today_date = datetime.date.today()
+        today_date = datetime.datetime.today()
         subreddit = reddit.subreddit("linuxupskillchallenge")
         print("\nPosting to: r/upskillchallenge - with today's date: ", today_date)
 
@@ -68,17 +68,24 @@ def main():
             print("Using BOGUS date of: ", today_date)
 
         else:
-            today_date = datetime.date.today()
+            today_date = datetime.datetime.today()
             print("And working with today's date: ", today_date)
 
     #   Choose the correct 'time_bump' 
-    time_bump = 0   #   If local timezone is NZ
-    # time_bump = +12 #   If local timezone is UTC (i.e. a cloud server)
+    # time_bump = 0   #   If local timezone is NZ
+    time_bump = +12 #   If local timezone is UTC (i.e. a cloud server)
 
     #   ...and apply it
-    # print("Before bump: ", today_date)
+    print("Before bump: ", today_date)
     today_date = today_date + datetime.timedelta(hours=time_bump)
-    # print("After bump:  ", today_date)
+    print("After bump:  ", today_date)
+
+    #   Note, until now 'today_date' has been a datetime object because we 
+    #   cared about the time part. From now on we don't, so this next active 
+    #   line converts it to type 'date' - something Python is happy to let us do
+    print("Which we trim to just date:")
+    today_date = today_date.date()
+    print (today_date)
 
     #   Which day of the course are we on?
     day_num, month_name, next_month = check_today(today_date)
@@ -137,4 +144,5 @@ def main():
 if __name__ == "__main__":
     import sys
     main()
+
 
