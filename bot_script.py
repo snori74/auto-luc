@@ -74,15 +74,13 @@ def main():
     #   Choose the correct 'time_bump' 
     # time_bump = 0   #   If local timezone is NZ
     time_bump = +12 #   If local timezone is UTC (i.e. a cloud server)
-
-    #   ...and apply it
     print("Before bump: ", today_date)
     today_date = today_date + datetime.timedelta(hours=time_bump)
     print("After bump:  ", today_date)
 
-    #   Note, until now 'today_date' has been a datetime object because we 
-    #   cared about the time part. From now on we don't, so this next active 
-    #   line converts it to type 'date' - something Python is happy to let us do
+    #   Until now 'today_date' has been a datetime object because we cared about 
+    #   the time part. From now on we don't, and a simple date is expected. So this next 
+    #   active line converts it to type 'date' - something Python is happy to let us do.
     print("Which we trim to just date:")
     today_date = today_date.date()
     print (today_date)
