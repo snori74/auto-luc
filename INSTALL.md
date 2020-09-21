@@ -22,8 +22,8 @@ Here's how to setup the directory for the bot:
 
 Here's how to setup the config file:
 
-    mkdir ~./auto-luc
-    vim .auto-luc/config
+    mkdir ~/.auto-luc
+    vim ~/.auto-luc/config
 
 Note 1: You will need to edit the value of time_bump in 
 bot_script.py based on your timezone
