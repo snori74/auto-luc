@@ -3,8 +3,7 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
 """
-   bot-script.py - Run every day. Pulls the lessons for the Linux Upskill 
-                    Challenge from Github into the subreddit 
+   bot-script.py - Pulls the lessons for the Linux Upskill Challenge from Github into the subreddit 
 
     Note 1: Don't run more that once a day - you'll risk multiple posting 
     
@@ -20,9 +19,8 @@
          - So, the script will run and say "No lesson on a weekend" - not good
          - This is why the "time_bump" variable exists
 
-    Note 3: This also means that the 'cron' or similar used to run the script
-            can't be run just Monday-Friday (which might seem sensible), but 
-            instead should be scheduled EVERY day
+    Note 3: This also means that the script can't be run just Monday-Friday (which might 
+            seem sensible), but instead should be scheduled EVERY day
             
          """
 
@@ -71,9 +69,10 @@ def main():
             today_date = datetime.datetime.today()
             print("And working with today's date: ", today_date)
 
-    #   Choose the correct 'time_bump' 
+    #   Hardcode the correct 'time_bump' 
     # time_bump = 0   #   If local timezone is NZ
-    time_bump = +12 #   If local timezone is UTC (i.e. a cloud server)
+    time_bump = +12 #     If local timezone is UTC (i.e. a cloud server)
+    
     print("Before bump: ", today_date)
     today_date = today_date + datetime.timedelta(hours=time_bump)
     print("After bump:  ", today_date)
@@ -99,7 +98,6 @@ def main():
         delete_title(subreddit, "HOW THIS WORKS")
         #   then pull in the current one and pin...
         get_post_pin_file(subreddit, "how-this-works.md")
- #
         #   clear last few of last month's lessons...
         delete_day(subreddit, 20)
         delete_day(subreddit, 19)

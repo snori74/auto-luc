@@ -16,7 +16,7 @@ def check_today(thisdate):
     Simple? Yes, but there are some surprising corner cases, e.g.:
      - sometimes the course doesn't start until the 7th of the month (e.g.September 2020)
      - the last day or two of <MONTH>'s course end up being in <MONTH+1> (e.g September 2020)
-     - there's sometimes a whole week gap at the end of a course (e.g. June 2020)
+     - there's sometimes a whole week's gap at the end of a course (e.g. June 2020)
 
     """
     delta = datetime.timedelta(days=1)
@@ -29,9 +29,7 @@ def check_today(thisdate):
     )
 
     #   No lesson on the weekend
-    if days_into_week == 6:
-        return (None, None, None)
-    if days_into_week == 7:
+    if (days_into_week == 6) or (days_into_week == 7):
         return (None, None, None)
 
     #   Find the Monday of that week...
@@ -92,7 +90,6 @@ def get_file(filename):
     body = strcontent.partition("\n")[2]
     #   and then we trim the leading "# " off the title...
     title = title.partition("# ")[2]
-    # print("Title:\n", title, "\nBody: \n", body)    #   DEBUGGER
     return [title, body]
 
 
@@ -131,7 +128,6 @@ def insert_backlink(sr, body, day_num):
         for post in sr.new(limit=25):
             # print("Checking", post.title )
             if post.title.startswith(bl_title):
-                # print("Yup! foundit")
                 bl_url = post.url
 
         split_text = "Copyright 2012-2020 @snori74"
@@ -147,7 +143,6 @@ def insert_backlink(sr, body, day_num):
 
 def get_post_pin_day(sr, day_num):
     title, body = get_day(day_num)
-    # print("In get_post_pin_day\nTitle:\n", title, "\nBody:\n", body)    #   DEBUGGER
     body = insert_backlink(sr, body, day_num)
     print("Posting: ", title)
     post = sr.submit(
