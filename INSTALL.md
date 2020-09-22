@@ -4,7 +4,6 @@
 Can be installed to a number of places, but let's assume that you
 want to install to directory 'bot' in your own home directory. 
 
-
 First, you need to install the ability to create Python 'virtual environments'
 like this:
 
@@ -26,7 +25,7 @@ Here's how to setup the config file:
     vim ~/.auto-luc/config
 
 Note 1: You will need to edit the value of time_bump in 
-bot_script.py based on your timezone
+bot_script.py based on the timezone of your server
 
 Note 2: The format for _.auto-luc/config_ is given in _settings.py_.
 
@@ -34,6 +33,22 @@ To run the bot:
 
     cd ~/bot 
     source bin/activate
-    python3 bot_script <params>
+    python3 bot_script.py <params> >> /var/log/bot.log 2>> /var/log/bot-error.log
 
+You may want to wrap this up as a shell script, and add some logging, e.g:
+
+    #!/bin/bash
+    cd ~/bot 
+    source bin/activate
+    python3 bot_script.py TEST >> /var/log/bot.log 2>> /var/log/bot-error.log
+
+
+There are a couple of ways to call this daily at the correct time. If using 'crontab', 
+a suitable entry would look like:
+
+    SHELL=/bin/sh
+    PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+    # m h dom mon dow command
+    1 20	* * *	 /root/run-bot
 
