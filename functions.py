@@ -115,7 +115,6 @@ def get_advert_file(filename):
     title = title.partition("TITLE: ")[2]
     return [title, body]
 
-
 def insert_backlink(sr, body, day_num):
     #   go direct to the numbered lesson files
     if day_num == 1:
@@ -126,9 +125,11 @@ def insert_backlink(sr, body, day_num):
         bl_url = "<missing>"
         print("Previous post: ", bl_title)
         for post in sr.new(limit=25):
-            # print("Checking", post.title )
+            print("Checking", post.title )
             if post.title.startswith(bl_title):
+                print("Yup! foundit")
                 bl_url = post.url
+                break
 
         split_text = "Copyright 2012-2020 @snori74"
         top_of_body = body.partition(split_text)[0]
@@ -139,7 +140,6 @@ def insert_backlink(sr, body, day_num):
         body = top_of_body + backlink_text + split_text + bottom_of_body
 
     return body
-
 
 def get_post_pin_day(sr, day_num):
     title, body = get_day(day_num)
