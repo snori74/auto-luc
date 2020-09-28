@@ -3,7 +3,6 @@
 
 import datetime
 import praw
-from github import Github
 from settings import *
 import time
 
