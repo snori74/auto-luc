@@ -5,7 +5,7 @@ import datetime
 import praw
 from github import Github
 from settings import *
-
+import time
 
 def check_today(thisdate):
     """
@@ -158,7 +158,16 @@ def get_post_pin_day(sr, day_num):
         collection_id=None,
     )
 
+    #   and approve that post
+    time.sleep(5)
+    print("Approving...")
+    try:
+        post.mod.approve()
+    except:
+        print("Hmm, can't approve it for some reason...")
+    
     #   and sticky/pin that post
+    time.sleep(5)
     print("Stickying...")
     try:
         post.mod.sticky(state=True)
