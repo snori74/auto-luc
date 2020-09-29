@@ -163,7 +163,7 @@ def get_post_pin_day(sr, day_num):
     try:
         post.mod.approve()
     except:
-        print("Hmm, can't approve it for some reason...")
+        print("WARNING: can't approve it for some reason...")
     
     #   and sticky/pin that post
     time.sleep(5)
@@ -171,7 +171,7 @@ def get_post_pin_day(sr, day_num):
     try:
         post.mod.sticky(state=True)
     except:
-        print("Hmm, can't sticky it for some reason...")
+        print("WARNING: can't sticky it for some reason...")
 
     #
     #    and pop in a matching "Thoughts and comments" post...
@@ -213,14 +213,14 @@ def get_post_pin_file(subreddit, filename):
     try:
         post.mod.approve()
     except:
-        print("Hmm, can't approve it for some reason...")
+        print("WARNING: can't approve it for some reason...")
 
     #   and sticky that it
     print("Stickying...")
     try:
         post.mod.sticky(state=True)
     except:
-        print("Hmm, can't sticky it for some reason...")
+        print("WARNING: can't sticky it for some reason...")
 
  
 
@@ -259,7 +259,7 @@ def get_post_advert(subreddit, subreddit_name):
     print("Advert: ", advert_file)
     title, body = get_advert_file(advert_file)
     if title == "":
-        print("Bugger! for some reason no 'title'")
+        print("WARNING: for some reason could not find 'title'...")
         return
 
     print("Title and body: ", title, body)
@@ -305,7 +305,7 @@ def clear_all_pinned(subreddit):
                 post.mod.sticky(state=False)
                 post.mod.distinguish(how="no")
             except:
-                print("Hmm, can't sticky it for some reason...")
+                print("WARNING: can't sticky it for some reason...")
 
 
 def delete_day(subreddit, day_num):
@@ -327,15 +327,15 @@ def pin_title(subreddit, title):
                 print("Distinguishing...")
                 post.mod.distinguish(how="yes")
             except:
-                print("Can't distiguish for some reason...")
+                print("WARNING: can't distiguish for some reason...")
             try:
                 print("Approvng...")
                 post.mod.approve()
             except:
-                print("Can't approve for some reason...")
+                print("WARNING: can't approve for some reason...")
             try:
                 print("Stickying...")
                 post.mod.sticky(state=True)
             except:
-                print("Not able to sticky for some reason")
+                print("WARNING: not able to sticky for some reason...")
                 
