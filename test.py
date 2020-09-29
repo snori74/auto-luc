@@ -19,6 +19,7 @@ start_date = datetime.date(2020, 1, 1)
 end_date = datetime.date(2021, 1, 1)
 
 def daterange(start_date, end_date):
+    print("Test for: ", start_date, " to ", end_date)
     for n in range(int((end_date - start_date).days)):
         yield start_date + datetime.timedelta(n)
 
@@ -34,4 +35,5 @@ for single_date in daterange(start_date, end_date):
     cmd = "./bot_script.py TEST " + day + " 2>>test.err"
     #   Redirect BOTH errors and stdout
     # cmd = "./bot_script.py TEST " + day + ">> test.out 2>>test.err"
+    print("Command: ", cmd)
     os.system(cmd)

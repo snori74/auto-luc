@@ -3,8 +3,9 @@
 
 import datetime
 import praw
-from settings import *
 import time
+import requests
+from settings import *
 
 def check_today(thisdate):
     """
@@ -62,8 +63,6 @@ def get_day(daynum):
     Works out the filename for the day's lesson, then
     calls 'get_file' to pull directly from Github
     """
-    import requests
-
     filename = str(daynum).zfill(2) + ".md"  #   Padding '1' to '01'
     title, body = get_file(filename)
     return [title, body]
@@ -75,8 +74,6 @@ def get_file(filename):
     format, then splits the title text off and tidies it - and returns
     both it and the now-trimmed body as a list.
     """
-    import requests
-
     starturl = "https://raw.githubusercontent.com/snori74/linuxupskillchallenge/master/"
     url = starturl + filename
     r = requests.get(url, allow_redirects=True)
@@ -98,8 +95,6 @@ def get_advert_file(filename):
     format, then splits the title text off and tidies it - and returns
     both it and the now-trimmed body as a list.
     """
-    import requests
-
     starturl = "https://raw.githubusercontent.com/snori74/linuxupskillchallenge/master/"
     url = starturl + filename
     r = requests.get(url, allow_redirects=True)
@@ -140,119 +135,92 @@ def insert_backlink(sr, body, day_num):
 
     return body
 
-def get_post_pin_day(sr, day_num):
-    title, body = get_day(day_num)
-    body = insert_backlink(sr, body, day_num)
-    print("Posting: ", title)
-    post = sr.submit(
-        title,
-        selftext=body,
-        url=None,
-        flair_id=None,
-        flair_text=None,
-        resubmit=True,
-        send_replies=True,
-        nsfw=False,
-        spoiler=False,
-        collection_id=None,
-    )
 
-    #   and approve that post
-    time.sleep(5)
+def post(sr,title, body):
+    print("Posting: ", title)
+    sr.submit(
+            title,
+            selftext=body,
+       )
+
+
+def pause(secs):
+    for tic in range(secs):
+        time.sleep(1)
+        print(".", end="")
+    print("")   # for newline
+
+
+def approve(post):
     print("Approving...")
     try:
         post.mod.approve()
     except:
         print("WARNING: can't approve it for some reason...")
-    
-    #   and sticky/pin that post
-    time.sleep(5)
+     
+
+def sticky(post):
     print("Stickying...")
     try:
         post.mod.sticky(state=True)
     except:
         print("WARNING: can't sticky it for some reason...")
 
-    #
+
+def unsticky(post):
+    print("Unsticking...")
+    try:
+        post.mod.sticky(state=False)
+        post.mod.distinguish(how="no")
+    except:
+        print("WARNING: can't sticky it for some reason...")
+
+
+def get_post_pin_day(sr, day_num):
+    title, body = get_day(day_num)
+    #   a 'backlink' is handy...
+    body = insert_backlink(sr, body, day_num)
+    post(sr, title, body)
+    pause(5)
+    approve(post)
+    pause(5)
+    sticky(post)
+    pause(5)
     #    and pop in a matching "Thoughts and comments" post...
     title, body = get_file("thoughts-and-comments.md")
     #   replace X with the day number
     title = title.partition("X")[0] + str(day_num) + title.partition("X")[2]
-    post = sr.submit(
-        title,
-        selftext=body,
-        url=None,
-        flair_id=None,
-        flair_text=None,
-        resubmit=True,
-        send_replies=True,
-        nsfw=False,
-        spoiler=False,
-        collection_id=None,
-    )
-
-
-def get_post_pin_file(subreddit, filename):
+    post(sr, title, body)
+   
+def get_post_pin_file(sr, filename):
     title, body = get_file(filename)
-    print("Posting: ", title)
-    post = subreddit.submit(
-        title,
-        selftext=body,
-        url=None,
-        flair_id=None,
-        flair_text=None,
-        resubmit=True,
-        send_replies=True,
-        nsfw=False,
-        spoiler=False,
-        collection_id=None,
-    )
+    post(sr, title, body)
+    pause(5)
+    approve(post)
+    pause(5)
+    sticky(post)
+    
 
-    #   and approve that post
-    print("Approving...")
-    try:
-        post.mod.approve()
-    except:
-        print("WARNING: can't approve it for some reason...")
-
-    #   and sticky that it
-    print("Stickying...")
-    try:
-        post.mod.sticky(state=True)
-    except:
-        print("WARNING: can't sticky it for some reason...")
-
- 
-
-def get_post_file(subreddit, filename):
+def get_post_file(sr, filename):
     title, body = get_file(filename)
-    post = subreddit.submit(
-        title,
-        selftext=body,
-        url=None,
-        flair_id=None,
-        flair_text=None,
-        resubmit=True,
-        send_replies=True,
-        nsfw=False,
-        spoiler=False,
-        collection_id=None,
-    )
-    #   but don't sticky/pin this post
+    post(sr, title, body)
+   
 
-
-def get_post_advert(subreddit, subreddit_name):
+def get_post_advert(sr, subreddit_name):
     """
-    We retrive a file for each of the subreddits that we want to
-    advertise in, and post into each of those subreddits - unless
-    we're in TEST mode (i.e. if our "subreddit" is set to the test
-    location "LinuxUpSkillBotTest") - in which case we post the adverts
-    there too.
-
+    sr = The subreddit where we send lessons
+    subreddit_name = The subreddit where we want to advertise
+    
     The 'advert' text files are named in a very specific way:
 
            txt-for-linux-subreddit.md
            txt-for-sysadminblogs-reddit.md
+
+    ...and have a very specific format.
+
+    If sr == "linuxupskillBotTest" then we're in TEST mode and
+    we will post the adverts in that same directory. Otherwise they go 
+    to their specific subreddits.
 
     """
     advert_file = "txt-for-" + subreddit_name + "-subreddit.md"
@@ -262,51 +230,21 @@ def get_post_advert(subreddit, subreddit_name):
         print("WARNING: for some reason could not find 'title'...")
         return
 
-    print("Title and body: ", title, body)
-
-    if subreddit == "linuxupskillBotTest":
+    if sr == "linuxupskillBotTest":
         print("Posting advert to TEST subreddit")
-        post = subreddit.submit(
-            title,
-            selftext=body,
-            url=None,
-            flair_id=None,
-            flair_text=None,
-            resubmit=True,
-            send_replies=True,
-            nsfw=False,
-            spoiler=False,
-            collection_id=None,
-        )
-
+        post(sr, title, body)
+       
     else:
-        if subreddit == "linuxupskillChallenge":
-            sr = reddit.subreddit(subreddit_name)
-            print("Posting advert to ", sr, "LIVE subreddit")
-            post = sr.submit(
-                title,
-                selftext=body,
-                url=None,
-                flair_id=None,
-                flair_text=None,
-                resubmit=True,
-                send_replies=True,
-                nsfw=False,
-                spoiler=False,
-                collection_id=None,
-            )
+        if sr == "linuxupskillChallenge":
+            advert_sr = reddit.subreddit(subreddit_name)
+            print("Posting advert to: ", advert_sr)
+            post(advert_sr, title, body)
 
 
 def clear_all_pinned(subreddit):
     for post in subreddit.new(limit=25):
         if post.stickied:
-            print("Unsticking...")
-            try:
-                post.mod.sticky(state=False)
-                post.mod.distinguish(how="no")
-            except:
-                print("WARNING: can't sticky it for some reason...")
-
+            unsticky(post)
 
 def delete_day(subreddit, day_num):
     title = "Day " + str(day_num) + " - "
@@ -323,19 +261,7 @@ def delete_title(subreddit, title):
 def pin_title(subreddit, title):
     for post in subreddit.new(limit=25):
         if post.title.startswith(title):
-            try:
-                print("Distinguishing...")
-                post.mod.distinguish(how="yes")
-            except:
-                print("WARNING: can't distiguish for some reason...")
-            try:
-                print("Approvng...")
-                post.mod.approve()
-            except:
-                print("WARNING: can't approve for some reason...")
-            try:
-                print("Stickying...")
-                post.mod.sticky(state=True)
-            except:
-                print("WARNING: not able to sticky for some reason...")
+            approve(post)
+            pause(5)
+            sticky(post)
                 
