@@ -110,21 +110,22 @@ def get_advert_file(filename):
     return [title, body]
 
 def insert_backlink(sr, body, day_num):
-    #   go direct to the numbered lesson files
     if day_num == 1:
         print("No backlink in lesson 1")
     else:
+        #   we pull the lesson file for the previous directly from GitHub, and 
+        #   grab the backlink title from that...
         filename = str(day_num - 1).zfill(2) + ".md"  #   Padding '1' to '01'
         bl_title, bl_body = get_file(filename)
         bl_url = "<missing>"
         print("Previous post: ", bl_title)
+        #   ...then find that title in the posts in the subreddit
         for post in sr.new(limit=25):
             print("Checking", post.title )
             if post.title.startswith(bl_title):
                 print("Yup! foundit")
                 bl_url = post.url
                 break
-
         split_text = "Copyright 2012-2020 @snori74"
         top_of_body = body.partition(split_text)[0]
         bottom_of_body = body.partition(split_text)[2]
@@ -142,38 +143,6 @@ def post(sr,title, body):
             title,
             selftext=body,
        )
-
-
-def pause(secs):
-    for tic in range(secs):
-        time.sleep(1)
-        print(".", end="")
-    print("")   # for newline
-
-
-def approve(post):
-    print("Approving...")
-    try:
-        post.mod.approve()
-    except:
-        print("WARNING: can't approve it for some reason...")
-     
-
-def sticky(post):
-    print("Stickying...")
-    try:
-        post.mod.sticky(state=True)
-    except:
-        print("WARNING: can't sticky it for some reason...")
-
-
-def unsticky(post):
-    print("Unsticking...")
-    try:
-        post.mod.sticky(state=False)
-        post.mod.distinguish(how="no")
-    except:
-        print("WARNING: can't sticky it for some reason...")
 
 
 def get_post_pin_day(sr, day_num):
@@ -264,4 +233,38 @@ def pin_title(subreddit, title):
             approve(post)
             pause(5)
             sticky(post)
+
+
+def pause(secs):
+    for tic in range(secs):
+        time.sleep(1)
+        print(".", end="", flush=True)
+    print("")   # for newline
+
+
+def approve(post):
+    print("Approving...")
+    try:
+        post.mod.approve()
+    except:
+        print("WARNING: can't approve it for some reason...")
+     
+
+def sticky(post):
+    print("Stickying...")
+    try:
+        post.mod.sticky(state=True)
+    except:
+        print("WARNING: can't sticky it for some reason...")
+
+
+def unsticky(post):
+    print("Unsticking...")
+    try:
+        post.mod.sticky(state=False)
+        post.mod.distinguish(how="no")
+    except:
+        print("WARNING: can't sticky it for some reason...")
+
+
                 
