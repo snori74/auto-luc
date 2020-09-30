@@ -7,6 +7,16 @@ import time
 import requests
 from settings import *
 
+#   reddit creds
+reddit = praw.Reddit(
+        user_agent=REDDIT_USER_AGENT,
+        client_id=REDDIT_CLIENT_ID,
+        client_secret=REDDIT_CLIENT_SECRET,
+        username=REDDIT_USERNAME,
+        password=REDDIT_PASSWORD,
+)
+
+
 def check_today(thisdate):
     """
     The course is described as:
@@ -246,16 +256,20 @@ def approve(post):
     print("Approving...")
     try:
         post.mod.approve()
-    except:
-        print("WARNING: can't approve it for some reason...")
+    except Exception as e:
+        print(e)
+    # except:
+    #    print("WARNING: can't approve it for some reason...")
      
 
 def sticky(post):
     print("Stickying...")
     try:
         post.mod.sticky(state=True)
-    except:
-        print("WARNING: can't sticky it for some reason...")
+    except Exception as e:
+        print(e)
+    #except:
+    #    print("WARNING: can't sticky it for some reason...")
 
 
 def unsticky(post):
@@ -263,8 +277,10 @@ def unsticky(post):
     try:
         post.mod.sticky(state=False)
         post.mod.distinguish(how="no")
-    except:
-        print("WARNING: can't sticky it for some reason...")
+    except Exception as e:
+        print(e)
+    # except:
+    #    print("WARNING: can't sticky it for some reason...")
 
 
                 
