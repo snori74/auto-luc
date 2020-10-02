@@ -4,6 +4,7 @@
 import os
 import sys
 import datetime
+from functions import pause
 
 #   Tests by running through the whole of year
 #   of 2020 - with all output redirected to:
@@ -37,3 +38,5 @@ for single_date in daterange(start_date, end_date):
     # cmd = "./bot_script.py TEST " + day + ">> test.out 2>>test.err"
     print("Command: ", cmd)
     os.system(cmd)
+    pause(5)
+

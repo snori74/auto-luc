@@ -149,40 +149,41 @@ def insert_backlink(sr, body, day_num):
 
 def post(sr,title, body):
     print("Posting: ", title)
-    sr.submit(
+    mypost= sr.submit(
             title,
             selftext=body,
        )
-
+    mypost.mod.approve()
+    return mypost
 
 def get_post_pin_day(sr, day_num):
     title, body = get_day(day_num)
     #   a 'backlink' is handy...
     body = insert_backlink(sr, body, day_num)
-    post(sr, title, body)
+    mypost = post(sr, title, body)
     pause(5)
-    approve(post)
+    approve(mypost)
     pause(5)
-    sticky(post)
+    sticky(mypost)
     pause(5)
     #    and pop in a matching "Thoughts and comments" post...
     title, body = get_file("thoughts-and-comments.md")
     #   replace X with the day number
     title = title.partition("X")[0] + str(day_num) + title.partition("X")[2]
-    post(sr, title, body)
+    mypost = post(sr, title, body)
    
 def get_post_pin_file(sr, filename):
     title, body = get_file(filename)
-    post(sr, title, body)
+    mypost = post(sr, title, body)
     pause(5)
-    approve(post)
+    approve(mypost)
     pause(5)
-    sticky(post)
+    sticky(mypost)
     
 
 def get_post_file(sr, filename):
     title, body = get_file(filename)
-    post(sr, title, body)
+    mypost = post(sr, title, body)
    
 
 def get_post_advert(sr, subreddit_name):
@@ -211,7 +212,7 @@ def get_post_advert(sr, subreddit_name):
 
     if sr == "linuxupskillBotTest":
         print("Posting advert to TEST subreddit")
-        post(sr, title, body)
+        mypost = post(sr, title, body)
        
     else:
         if sr == "linuxupskillChallenge":
@@ -280,7 +281,7 @@ def unsticky(post):
     except Exception as e:
         print(e)
     # except:
-    #    print("WARNING: can't sticky it for some reason...")
+    #    print("WARNING: can't unsticky it for some reason...")
 
 
                 
