@@ -106,7 +106,7 @@ def main():
         delete_day(subreddit, 16)
 
     elif day_num == 18:
-        #
+        
         #   retrive, post and pin today's lesson as normal
         clear_all_pinned(subreddit)
         get_post_pin_day(subreddit, day_num)
@@ -114,19 +114,27 @@ def main():
         
         #   delete the old "HOW..."
         delete_title(subreddit, "HOW THIS WORKS")
+        
         #   then pull in the current one and pin...
         get_post_pin_file(subreddit, "how-this-works.md")
         
-        #
-        #    ...and post custom 'advert' messages to subreddits. It's polite
-        #   to ask a 'mod' to OK this - we don't want to annoy anyone! Documenting 
-        #   these approvals here is convenient.
-        #
-        # get_post_advert(subreddit, "linux4noobs") # No reply from u/Pi31415926
+        #    ...and post custom 'advert' messages to subreddits. 
         get_post_advert(subreddit, "linuxadmin")    # OK'd by u/mthode, 13-Sept-2020
+        get_post_advert(subreddit, "sysadminblogs") # OK'd by u/VA_Network_Nerd, 13-Sept-2020
+        # get_post_advert(subreddit, "linux4noobs") # No reply from u/Pi31415926
         # get_post_advert(subreddit, "linuxmasterrace") # No reply from Mephiz
         # get_post_advert(subreddit, "linux")   # No reply from u/kylev
-        get_post_advert(subreddit, "sysadminblogs") # OK'd by u/VA_Network_Nerd, 13-Sept-2020
+        
+        #   and "Day 0" posts for the benefit of the new 'intake'...
+        get_post_file(subreddit, "00-AWS-Free-Tier.md")
+        get_post_file(subreddit, "00-Digital-Ocean.md")
+        get_post_file(subreddit, "00-Google-Cloud.md")
+
+
+
+
+
+
 
     elif day_num == None:
         print("\nNo lesson today...")
