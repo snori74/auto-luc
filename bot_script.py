@@ -11,7 +11,6 @@
          - Steve, in NZ, gets out of bed on a Monday morning
          - Feeds the cats, and makes himself a miso soup
          - Then posts Monday's lesson - (it's about 8 or 9am by this time)
-         
          - However, because this script runs "in the cloud", the server will be 
            running (almost always) on UTC - so the task must be scheduled for
            8PM. But, on Monday morning Steve's time, it'll be 8pm in Greenwich
@@ -33,14 +32,7 @@ subreddit = None
 
 
 def main():
-    reddit = praw.Reddit(
-        user_agent=REDDIT_USER_AGENT,
-        client_id=REDDIT_CLIENT_ID,
-        client_secret=REDDIT_CLIENT_SECRET,
-        username=REDDIT_USERNAME,
-        password=REDDIT_PASSWORD,
-    )
-
+   
     if len(sys.argv) < 2:
         sys.exit(
             "\n Usage: bot-script.py LIVE|TEST [<date>]"
@@ -69,6 +61,15 @@ def main():
             today_date = datetime.datetime.today()
             print("And working with today's date: ", today_date)
 
+    #   pull in the creds
+    reddit = praw.Reddit(
+        user_agent=REDDIT_USER_AGENT,
+        client_id=REDDIT_CLIENT_ID,
+        client_secret=REDDIT_CLIENT_SECRET,
+        username=REDDIT_USERNAME,
+        password=REDDIT_PASSWORD,
+    )
+
     #   Hardcode the correct 'time_bump' 
     # time_bump = 0   #   If local timezone is NZ
     time_bump = +12 #     If local timezone is UTC (i.e. a cloud server)
@@ -90,7 +91,6 @@ def main():
     if day_num == 1:
         #    Post and pin the standard "Day 1" lesson - and the ditto the "short video"
         #    Repost "HOW THIS WORKS" text. Don't pin, cos only two can be at a time
-        #
         clear_all_pinned(subreddit)
         get_post_pin_day(subreddit, day_num)
         get_post_pin_file(subreddit, "day1-short-video.md")
@@ -129,12 +129,6 @@ def main():
         get_post_file(subreddit, "00-AWS-Free-Tier.md")
         get_post_file(subreddit, "00-Digital-Ocean.md")
         get_post_file(subreddit, "00-Google-Cloud.md")
-
-
-
-
-
-
 
     elif day_num == None:
         print("\nNo lesson today...")
