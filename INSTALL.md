@@ -67,5 +67,5 @@ Then create a cron entry (as an ordinary user, or as root) by _crontab -e_ with 
     # m h dom mon dow 	command
     1 20	* * *	 /root/run-bot
 
-...which will run the script each day at 20:01 (8:01pm) - which is appropraite for a server running on UTC.
+...which will run the script each day at 20:01 (8:01pm) - which is appropriate for a server running on UTC.
 
