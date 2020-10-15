@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
-
 """
    bot-script.py - Pulls the lessons for the Linux Upskill Challenge from Github into the subreddit 
 
@@ -13,10 +11,10 @@
          - Then posts Monday's lesson - (it's about 8 or 9am by this time)
          - However, because this script runs "in the cloud", the server will be 
            running (almost always) on UTC - so the task must be scheduled for
-           8PM. But, on Monday morning Steve's time, it'll be 8pm in Greenwich
+           8PM. But, on Monday morning Steve's time, while it will be 8pm in Greenwich
            and it will be SUNDAY
          - So, the script will run and say "No lesson on a weekend" - not good
-         - This is why the "time_bump" variable exists
+         - This is why the "time_bump" variable exists...
 
     Note 3: This also means that the script can't be run just Monday-Friday (which might 
             seem sensible), but instead should be scheduled EVERY day
@@ -30,9 +28,17 @@ from settings import *
 
 subreddit = None
 
-
 def main():
-   
+
+    #   pull in the creds
+    reddit = praw.Reddit(
+        user_agent=REDDIT_USER_AGENT,
+        client_id=REDDIT_CLIENT_ID,
+        client_secret=REDDIT_CLIENT_SECRET,
+        username=REDDIT_USERNAME,
+        password=REDDIT_PASSWORD,
+    )
+
     if len(sys.argv) < 2:
         sys.exit(
             "\n Usage: bot-script.py LIVE|TEST [<date>]"
@@ -60,15 +66,6 @@ def main():
         else:
             today_date = datetime.datetime.today()
             print("And working with today's date: ", today_date)
-
-    #   pull in the creds
-    reddit = praw.Reddit(
-        user_agent=REDDIT_USER_AGENT,
-        client_id=REDDIT_CLIENT_ID,
-        client_secret=REDDIT_CLIENT_SECRET,
-        username=REDDIT_USERNAME,
-        password=REDDIT_PASSWORD,
-    )
 
     #   Hardcode the correct 'time_bump' 
     # time_bump = 0   #   If local timezone is NZ
@@ -129,6 +126,11 @@ def main():
         get_post_file(subreddit, "00-AWS-Free-Tier.md")
         get_post_file(subreddit, "00-Digital-Ocean.md")
         get_post_file(subreddit, "00-Google-Cloud.md")
+
+        #   calculate the start of the next course, and post a message about that
+        first_monday = start_of_next(today_date, month_name)
+        print("Next course starts on ", start_of_next)
+
 
     elif day_num == None:
         print("\nNo lesson today...")

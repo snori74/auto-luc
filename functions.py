@@ -48,14 +48,6 @@ def check_today(thisdate):
     month_num = thismonday.month  #    January=1, December=12
     month_name = thismonday.strftime("%B")
 
-    # TODO: OK, from month_num, 
-    # create the date of the middle of this month
-    # and jump forward to the midle of next month
-    # and back to the Monday of that week
-    # Then step back, week by week until month_num changes (we've go to far)
-    # So, back off, and we've found "The first Monday of next month" (e.g. "5 October")
-    # - which we then 'return' as the third in the list.
-
     #   Now, from that Monday, step back 7 days each time, counting,
     #   until Month.(this_monday) <> month_num.
     weeks_back = 0
@@ -75,6 +67,15 @@ def check_today(thisdate):
 
     return [day_num, month_name, "June"]
 
+def start_of_next(thisdate, monthname):
+    # TODO: OK, from month_num,
+    # create the date of the middle of this month
+    # and jump forward to the middle of next month
+    # and back to the Monday of that week
+    # Then step back, week by week until month_num changes (we've go to far)
+    # So, back off, and we've found "The first Monday of next month" (e.g. "5 October")
+    # - which we then 'return' as the third in the list.
+    return(start_of_next)
 
 def get_day(daynum):
     """
