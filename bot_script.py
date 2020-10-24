@@ -83,8 +83,7 @@ def main():
     print (today_date)
 
     #   Which day of the course are we on?
-    day_num, month_name, next_month = check_today(today_date)
-
+    day_num = check_today(today_date)
     if day_num == 1:
         #    Post and pin the standard "Day 1" lesson - and the ditto the "short video"
         #    Repost "HOW THIS WORKS" text. Don't pin, cos only two can be at a time
@@ -128,9 +127,10 @@ def main():
         get_post_file(subreddit, "00-Google-Cloud.md")
 
         #   calculate the start of the next course, and post a message about that
-        first_monday = start_of_next(today_date, month_name)
-        print("Next course starts on ", start_of_next)
-
+        first_monday = start_of_next(today_date)
+        #   expand
+        first_monday = "Next course starts on Monday, " + first_monday
+        post(subreddit, first_monday, "")
 
     elif day_num == None:
         print("\nNo lesson today...")

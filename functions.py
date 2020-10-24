@@ -21,12 +21,17 @@ def check_today(thisdate):
     """
     The course is described as:
 
-    "...runs from the first Monday of the month, and lasts for four weeks..."
+    "...runs from the first Monday of the month, 
+        and lasts for four weeks..."
 
-    Simple? Yes, but there are some surprising corner cases, e.g.:
-     - sometimes the course doesn't start until the 7th of the month (e.g.September 2020)
-     - the last day or two of <MONTH>'s course end up being in <MONTH+1> (e.g September 2020)
-     - there's sometimes a whole week's gap at the end of a course (e.g. June 2020)
+    Simple? Yes, but there are some surprising corner 
+            cases, e.g.:
+     - sometimes the course doesn't start until the 
+       7th of the month (e.g.September 2020)
+     - the last day or two of <MONTH>'s course end up 
+       being in <MONTH+1> (e.g September 2020)
+     - there's sometimes a whole week's gap at the end 
+       of a course (e.g. June 2020)
 
     """
     delta = datetime.timedelta(days=1)
@@ -40,7 +45,7 @@ def check_today(thisdate):
 
     #   No lesson on the weekend
     if (days_into_week == 6) or (days_into_week == 7):
-        return (None, None, None)
+        return None
 
     #   Find the Monday of that week...
     thismonday = thisdate - (delta * (days_into_week - 1))
@@ -63,19 +68,46 @@ def check_today(thisdate):
 
     #   ...but we only have 20 lessons...
     if day_num > 20:
-        return (None, None, None)
+        return None
 
-    return [day_num, month_name, "June"]
+    return day_num
 
-def start_of_next(thisdate, monthname):
-    # TODO: OK, from month_num,
-    # create the date of the middle of this month
-    # and jump forward to the middle of next month
-    # and back to the Monday of that week
-    # Then step back, week by week until month_num changes (we've go to far)
-    # So, back off, and we've found "The first Monday of next month" (e.g. "5 October")
-    # - which we then 'return' as the third in the list.
-    return(start_of_next)
+def start_of_next(thisdate):
+    """
+    Use similar technique as check_today()
+
+    Date:               Expected result:
+    =====               ================
+    30 Sept 2020        5 October 2020
+    30 December 2020    4 January 2021
+    24 June 2020        6 July 2020
+    27 August 2020      7 September 2020
+
+   """
+    delta = datetime.timedelta(days=1)
+    delta7 = datetime.timedelta(days=7)
+    deltam = datetime.timedelta(weeks=4)
+
+    # hop back a week...
+    thisdate = thisdate - delta7
+    # and to the Monday of that week...
+    thisdate = thisdate - (delta * (thisdate.isoweekday() - 1))
+    # then jump a month forward...
+    thisdate= thisdate + deltam
+    # and to the Monday of that week...
+    thisdate = thisdate - (delta * (thisdate.isoweekday() - 1))
+    #   Now, from that Monday, step back 7 days each time, counting,
+    #   until we get into the previous month
+    weeks_back = 0
+    month_num = thisdate.month
+    while thisdate.month == month_num:
+        thisdate = thisdate - (delta7)
+        weeks_back = weeks_back + 1
+    #   We've gone one week too far back, so...
+    thisdate = thisdate + (delta7)
+    start_date_of_next = thisdate.strftime("%-d %B %Y")
+    # e.g. "2 November 2020"
+    return(start_date_of_next)
 
 def get_day(daynum):
     """
