@@ -26,12 +26,9 @@ def check_today(thisdate):
 
     Simple? Yes, but there are some surprising corner 
             cases, e.g.:
-     - sometimes the course doesn't start until the 
-       7th of the month (e.g.September 2020)
-     - the last day or two of <MONTH>'s course end up 
-       being in <MONTH+1> (e.g September 2020)
-     - there's sometimes a whole week's gap at the end 
-       of a course (e.g. June 2020)
+     - sometimes the course doesn't start until the 7th of the month (e.g.September 2020)
+     - the last day or two of <MONTH>'s course end up being in <MONTH+1> (e.g September 2020)
+     - there's sometimes a whole week's gap at the end of a course (e.g. June 2020)
 
     """
     delta = datetime.timedelta(days=1)
@@ -177,7 +174,7 @@ def insert_backlink(sr, body, day_num):
                 print("Yup! foundit")
                 bl_url = post.url
                 break
-        split_text = "Copyright 2012-2020 @snori74"
+        split_text = "*Copyright 2012-2020 @snori74"
         top_of_body = body.partition(split_text)[0]
         bottom_of_body = body.partition(split_text)[2]
         backlink_text = (
