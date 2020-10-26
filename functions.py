@@ -191,7 +191,7 @@ def post(sr,title, body):
             title,
             selftext=body,
        )
-    mypost.mod.approve()
+    approve(mypost)
     return mypost
 
 def get_post_pin_day(sr, day_num):
@@ -222,7 +222,9 @@ def get_post_pin_file(sr, filename):
 def get_post_file(sr, filename):
     title, body = get_file(filename)
     mypost = post(sr, title, body)
-   
+    pause(5)
+    approve(mypost)
+
 
 def get_post_advert(sr, subreddit_name):
     """
